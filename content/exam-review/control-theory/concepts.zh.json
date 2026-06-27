@@ -1,0 +1,62 @@
+[
+  {
+    "term": "传递函数",
+    "en": "Transfer Function",
+    "definition": "在零初始条件下，系统输出的拉普拉斯变换与输入的拉普拉斯变换之比，记作 G(s)。"
+  },
+  {
+    "term": "开环传递函数",
+    "en": "Open-loop Transfer Function",
+    "definition": "反馈回路断开后，从输入到反馈端的总传递函数，通常写成 G(s)H(s)。"
+  },
+  {
+    "term": "闭环传递函数",
+    "en": "Closed-loop Transfer Function",
+    "definition": "闭环系统输出与输入之比，负反馈单环系统常写成 G(s)/[1+G(s)H(s)]。"
+  },
+  {
+    "term": "特征方程",
+    "en": "Characteristic Equation",
+    "definition": "闭环系统分母等于零得到的方程，其根决定系统稳定性和动态品质。"
+  },
+  {
+    "term": "阻尼比",
+    "en": "Damping Ratio",
+    "definition": "二阶系统参数 zeta，用于刻画振荡衰减速度和超调程度。"
+  },
+  {
+    "term": "自然频率",
+    "en": "Natural Frequency",
+    "definition": "二阶系统参数 omega_n，决定系统响应快慢的基础尺度。"
+  },
+  {
+    "term": "根轨迹",
+    "en": "Root Locus",
+    "definition": "开环增益变化时，闭环极点在复平面上的运动轨迹。"
+  },
+  {
+    "term": "劳斯判据",
+    "en": "Routh Criterion",
+    "definition": "通过特征方程系数构造劳斯表，利用首列符号变化判断右半平面根个数。"
+  },
+  {
+    "term": "稳态误差",
+    "en": "Steady-state Error",
+    "definition": "过渡过程结束后输入与输出之间保留下来的误差，与系统型别密切相关。"
+  },
+  {
+    "term": "系统型别",
+    "en": "System Type",
+    "definition": "开环传递函数中积分环节的个数，用来判断系统对阶跃、斜坡等输入的稳态误差。"
+  },
+  {
+    "term": "相角裕度",
+    "en": "Phase Margin",
+    "definition": "幅值穿越频率处，相位距离 -180 度还剩多少，是频域稳定裕度的核心指标。"
+  },
+  {
+    "term": "幅值裕度",
+    "en": "Gain Margin",
+    "definition": "相角达到 -180 度时，系统增益距离失稳点还差多少。"
+  }
+]

@@ -1,0 +1,79 @@
+---
+title: "Writing Blog Posts"
+date: "2026-06-18"
+description: "A guide to creating and formatting blog posts with MDX."
+tags: ["guides", "blog"]
+---
+
+This guide explains how to write and publish blog posts on this site.
+
+## File Naming
+
+Blog posts live in `content/blog/` and use the pattern:
+
+```
+{slug}.{lang}.mdx
+```
+
+Examples:
+- `my-first-post.en.mdx` (English)
+- `my-first-post.zh.mdx` (Chinese)
+
+The `{slug}` becomes the URL: `/blog/my-first-post`
+
+## Frontmatter
+
+Every post must start with YAML frontmatter:
+
+```yaml
+---
+title: "Your Post Title"
+date: "2026-06-19"
+description: "A brief description shown in the post list and search results."
+tags: ["react", "nextjs", "tutorial"]
+---
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `title` | ✅ | The post title displayed on the page |
+| `date` | ✅ | Publication date (YYYY-MM-DD) |
+| `description` | ✅ | Summary for cards and search |
+| `tags` | ❌ | Array of tags for filtering |
+
+## Writing Content
+
+After the frontmatter, write standard Markdown with optional JSX:
+
+### Code Blocks
+
+Use fenced code blocks with language identifiers:
+
+````markdown
+```tsx
+function Hello() {
+  return <h1>Hello!</h1>;
+}
+```
+````
+
+Supported languages include: `tsx`, `ts`, `js`, `jsx`, `bash`, `json`, `css`, `html`, `python`, `rust`, and many more.
+
+### Links & Images
+
+```markdown
+[Link text](https://example.com)
+![Alt text](/images/photo.jpg)
+```
+
+### Tables
+
+```markdown
+| Column 1 | Column 2 |
+|----------|----------|
+| Cell 1   | Cell 2   |
+```
+
+## Bilingual Posts
+
+Always create both `.en.mdx` and `.zh.mdx` files for each post. The language toggle in the header switches between them.

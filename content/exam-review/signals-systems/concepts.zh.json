@@ -1,0 +1,10 @@
+[
+  {"term": "冲激函数", "en": "Impulse Function", "definition": "δ(t) 是一种广义函数，面积为 1，t≠0 时值为 0。具有采样性质：∫x(t)δ(t-t₀)dt = x(t₀)。"},
+  {"term": "卷积", "en": "Convolution", "definition": "LTI 系统的基本运算。y(t)=x(t)*h(t)=∫x(τ)h(t-τ)dτ。时域卷积对应频域乘积。"},
+  {"term": "傅里叶变换", "en": "Fourier Transform", "definition": "将时域信号分解为不同频率的复指数分量。X(jω)=∫x(t)e^(-jωt)dt，反映信号的频谱特性。"},
+  {"term": "拉普拉斯变换", "en": "Laplace Transform", "definition": "傅里叶变换的推广，将时域信号变换到复频域。X(s)=∫x(t)e^(-st)dt，s=σ+jω。"},
+  {"term": "Z 变换", "en": "Z-Transform", "definition": "离散时间信号的复频域变换。X(z)=Σx[n]z^(-n)，是离散系统分析的基本工具。"},
+  {"term": "系统函数", "en": "System Function", "definition": "LTI 系统零状态响应的变换与输入变换之比。连续域 H(s)，离散域 H(z)。"},
+  {"term": "收敛域", "en": "Region of Convergence", "definition": "使拉普拉斯变换或 Z 变换积分/求和收敛的复变量取值范围。ROC 决定了变换的唯一性。"},
+  {"term": "频率响应", "en": "Frequency Response", "definition": "系统对正弦稳态输入的响应特性。H(jω)=|H(jω)|∠H(jω)，包含幅频和相频特性。"}
+]

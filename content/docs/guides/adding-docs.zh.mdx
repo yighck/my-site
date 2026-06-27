@@ -1,0 +1,108 @@
+---
+title: "添加文档"
+date: "2026-06-18"
+description: "如何向知识库添加新的文档页面。"
+tags: ["guides", "docs"]
+---
+
+本指南介绍如何向站点添加文档页面。
+
+## 目录结构
+
+文档存放在 `content/docs/` 目录下，可以组织为子目录：
+
+```
+content/docs/
+  getting-started/
+    introduction.en.mdx
+    introduction.zh.mdx
+    installation.en.mdx
+    installation.zh.mdx
+  guides/
+    writing-blog.en.mdx
+    writing-blog.zh.mdx
+    adding-docs.en.mdx
+    adding-docs.zh.mdx
+```
+
+子目录在侧边栏导航中显示为**分组**。
+
+## 文件命名
+
+与博客文章相同的格式：
+
+```
+{slug}.{lang}.mdx
+```
+
+URL 路径镜像目录结构：
+- `content/docs/getting-started/installation.en.mdx` → `/docs/getting-started/installation`
+
+## Frontmatter
+
+```yaml
+---
+title: "页面标题"
+date: "2026-06-19"
+description: "页面的简要描述。"
+tags: ["可选", "标签"]
+---
+```
+
+## 侧边栏导航
+
+侧边栏根据目录结构**自动生成**：
+
+- **目录**成为可折叠的分组
+- **文件**成为链接，按文件系统顺序排列
+- frontmatter 中的 **title** 作为链接文本显示
+
+要控制页面顺序，可以使用数字前缀命名文件：
+
+```
+01-introduction.en.mdx
+02-installation.en.mdx
+03-configuration.en.mdx
+```
+
+## 编写技巧
+
+### 使用标题构建结构
+
+标题（`##`、`###`）会自动生成页面右侧的目录。
+
+### 添加代码示例
+
+技术文档需要具体的代码示例：
+
+```bash
+# 在 bash 块中展示命令
+npm run build
+```
+
+```tsx
+// 在对应语言块中展示代码
+export default function Page() {
+  return <div>内容</div>;
+}
+```
+
+### 使用引用块标注重要信息
+
+带粗体前缀的引用块适合做提示：
+
+> **注意：** 这是读者应该关注的重要提示。
+
+> **警告：** 修改此配置时请谨慎操作。
+
+### 页面间互相引用
+
+使用相对链接引用其他文档页面：
+
+```markdown
+请参阅[安装指南](/docs/getting-started/installation)了解搭建步骤。
+```
+
+## 双语内容
+
+请同时创建 `.en.mdx` 和 `.zh.mdx` 文件。语言切换按钮会在两者之间切换。

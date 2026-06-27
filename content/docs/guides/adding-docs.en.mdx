@@ -1,0 +1,108 @@
+---
+title: "Adding Documentation"
+date: "2026-06-18"
+description: "How to add new documentation pages to the knowledge base."
+tags: ["guides", "docs"]
+---
+
+This guide explains how to add documentation pages to the site.
+
+## Directory Structure
+
+Documentation lives in `content/docs/` and can be organized into subdirectories:
+
+```
+content/docs/
+  getting-started/
+    introduction.en.mdx
+    introduction.zh.mdx
+    installation.en.mdx
+    installation.zh.mdx
+  guides/
+    writing-blog.en.mdx
+    writing-blog.zh.mdx
+    adding-docs.en.mdx
+    adding-docs.zh.mdx
+```
+
+Subdirectories appear as **groups** in the sidebar navigation.
+
+## File Naming
+
+Same pattern as blog posts:
+
+```
+{slug}.{lang}.mdx
+```
+
+The URL path mirrors the directory structure:
+- `content/docs/getting-started/installation.en.mdx` → `/docs/getting-started/installation`
+
+## Frontmatter
+
+```yaml
+---
+title: "Page Title"
+date: "2026-06-19"
+description: "Brief description of this page."
+tags: ["optional", "tags"]
+---
+```
+
+## Sidebar Navigation
+
+The sidebar is **automatically generated** from the directory structure:
+
+- **Directories** become collapsible groups
+- **Files** become links, sorted by filesystem order
+- The **title** from frontmatter is displayed as the link text
+
+To control the order of pages, name files with numeric prefixes:
+
+```
+01-introduction.en.mdx
+02-installation.en.mdx
+03-configuration.en.mdx
+```
+
+## Writing Tips
+
+### Use headings for structure
+
+Headings (`##`, `###`) automatically generate the table of contents on the right side of the page.
+
+### Add code examples
+
+Technical documentation benefits from concrete code examples:
+
+```bash
+# Show commands in bash blocks
+npm run build
+```
+
+```tsx
+// Show code in appropriate language blocks
+export default function Page() {
+  return <div>Content</div>;
+}
+```
+
+### Use callouts for important info
+
+Blockquotes with a bold prefix work well for callouts:
+
+> **Note:** This is an important note that readers should pay attention to.
+
+> **Warning:** Be careful when modifying this configuration.
+
+### Link between pages
+
+Reference other documentation pages with relative links:
+
+```markdown
+See the [Installation Guide](/docs/getting-started/installation) for setup instructions.
+```
+
+## Bilingual Content
+
+Always create both `.en.mdx` and `.zh.mdx` files. The language toggle switches between them.

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "probability",
+    "name": { "en": "Probability", "zh": "概率论" },
+    "icon": "🎲",
+    "color": "from-blue-500 to-cyan-500",
+    "description": {
+      "en": "Review probability theory, random variables, distributions, and core statistical methods.",
+      "zh": "复习概率论基础、随机变量、常见分布以及统计推断的核心方法。"
+    }
+  },
+  {
+    "id": "control-theory",
+    "name": { "en": "Control Theory", "zh": "自动控制原理" },
+    "icon": "🧭",
+    "color": "from-purple-500 to-pink-500",
+    "description": {
+      "en": "Focus on feedback systems, transfer functions, stability analysis, and root locus for final review.",
+      "zh": "围绕反馈系统、传递函数、稳定性分析和根轨迹法做期末复习。"
+    }
+  },
+  {
+    "id": "digital-circuits",
+    "name": { "en": "Digital Circuits", "zh": "数字电路" },
+    "icon": "💡",
+    "color": "from-orange-500 to-red-500",
+    "description": {
+      "en": "Refresh Boolean algebra, logic gates, combinational circuits, and sequential circuits.",
+      "zh": "系统梳理布尔代数、逻辑门、组合逻辑与时序逻辑电路。"
+    }
+  },
+  {
+    "id": "signals-systems",
+    "name": { "en": "Signals and Systems", "zh": "信号与系统" },
+    "icon": "📈",
+    "color": "from-green-500 to-teal-500",
+    "description": {
+      "en": "Cover continuous and discrete signals, transforms, and standard system analysis methods.",
+      "zh": "复习连续与离散信号、常见变换，以及系统分析的标准方法。"
+    }
+  }
+]

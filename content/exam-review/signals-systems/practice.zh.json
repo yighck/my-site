@@ -1,0 +1,7 @@
+[
+  {"question": "信号 x(t)=e^(-2t)u(t) 的傅里叶变换为？", "options": ["1/(2+jω)", "1/(jω-2)", "1/(2+jω)²", "2πδ(ω-2)"], "answer": 0, "explanation": "e^(-at)u(t) ↔ 1/(a+jω)，a=2，所以 X(jω)=1/(2+jω)。"},
+  {"question": "x(t)=u(t) 的拉普拉斯变换及收敛域为？", "options": ["1/s, Re(s)>0", "1/s, Re(s)<0", "1/(s+1), Re(s)>-1", "s, 全平面"], "answer": 0, "explanation": "u(t) ↔ 1/s，收敛域 Re(s)>0。"},
+  {"question": "LTI 系统 h(t)=e^(-3t)u(t)，输入 x(t)=u(t) 时的零状态响应 y(t)=？", "options": ["(1/3)(1-e^(-3t))u(t)", "e^(-3t)u(t)", "(1-e^(-3t))u(t)", "te^(-3t)u(t)"], "answer": 0, "explanation": "Y(s)=H(s)X(s)=[1/(s+3)]·[1/s]=1/[s(s+3)]=(1/3)[1/s-1/(s+3)]，反变换得 y(t)=(1/3)(1-e^(-3t))u(t)。"},
+  {"question": "离散系统 H(z)=z/(z-0.5)，该系统是否稳定？", "options": ["稳定", "不稳定", "临界稳定", "无法判断"], "answer": 0, "explanation": "极点 z=0.5 在单位圆内（|0.5|<1），所以因果系统稳定。"},
+  {"question": "x[n]=δ[n-2] 的 Z 变换为？", "options": ["z^(-2)", "z²", "1", "z^(-2)/(z-1)"], "answer": 0, "explanation": "δ[n-n₀] ↔ z^(-n₀)，所以 δ[n-2] ↔ z^(-2)。时移性质。"}
+]

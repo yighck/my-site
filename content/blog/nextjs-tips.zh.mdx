@@ -1,0 +1,112 @@
+---
+title: "Next.js 实用技巧"
+date: "2026-06-18"
+description: "从实际项目中总结的 Next.js 实用技巧和最佳实践。"
+tags: ["nextjs", "tips", "react"]
+---
+
+在使用 Next.js 开发一段时间后，以下是一些显著改善了我开发效率的实用技巧。
+
+## 1. 默认使用服务端组件
+
+在 App Router 中，组件默认就是服务端组件。只有在需要交互（状态、副作用、事件处理）时才添加 `"use client"`。
+
+```tsx
+// ✅ 服务端组件（默认）— 快速，不向客户端发送 JS
+export default async function PostList() {
+  const posts = await db.posts.findMany();
+  return (
+    <ul>
+      {posts.map(post => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+```tsx
+"use client";
+
+// ✅ 客户端组件 — 仅在需要交互时使用
+import { useState } from "react";
+
+export function LikeButton() {
+  const [liked, setLiked] = useState(false);
+  return (
+    <button onClick={() => setLiked(!liked)}>
+      {liked ? "❤️" : "🤍"}
+    </button>
+  );
+}
+```
+
+## 2. 文件与路由共置
+
+将相关文件放在一起。把样式、测试和辅助文件放在对应路由旁边：
+
+```
+app/
+  blog/
+    [slug]/
+      page.tsx        ← 路由组件
+      loading.tsx     ← 加载状态
+      error.tsx       ← 错误边界
+      opengraph-image ← OG 图片
+```
+
+## 3. 使用 `loading.tsx` 提供即时反馈
+
+在任意路由文件夹中添加 `loading.tsx`，即可通过 Suspense 自动获得加载 UI：
+
+```tsx
+// app/blog/[slug]/loading.tsx
+export default function Loading() {
+  return <div className="animate-pulse">加载中...</div>;
+}
+```
+
+## 4. 并行数据获取
+
+并行获取数据以避免瀑布式请求：
+
+```tsx
+export default async function Dashboard() {
+  // 这些请求并行执行！
+  const [user, posts, analytics] = await Promise.all([
+    getUser(),
+    getPosts(),
+    getAnalytics(),
+  ]);
+
+  return (
+    <div>
+      <UserHeader user={user} />
+      <PostList posts={posts} />
+      <AnalyticsChart data={analytics} />
+    </div>
+  );
+}
+```
+
+## 5. 使用 Metadata 优化 SEO
+
+通过 `metadata` 导出实现动态 SEO：
+
+```tsx
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const post = await getPost(params.slug);
+  return {
+    title: post.title,
+    description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+    },
+  };
+}
+```
+
+这些模式让我的 Next.js 应用更快、更易维护。希望对你也有帮助！

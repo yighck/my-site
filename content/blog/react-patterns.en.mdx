@@ -1,0 +1,116 @@
+---
+title: "Common React Design Patterns"
+date: "2026-06-17"
+description: "An overview of essential React patterns: compound components, render props, custom hooks, and more."
+tags: ["react", "patterns", "architecture"]
+---
+
+React's component model enables powerful design patterns. Here are the ones I use most frequently.
+
+## Compound Components
+
+Compound components let you create flexible APIs where parent and child components share implicit state:
+
+```tsx
+import { createContext, useContext, useState } from "react";
+
+const TabsContext = createContext(null);
+
+function Tabs({ children, defaultTab }) {
+  const [active, setActive] = useState(defaultTab);
+  return (
+    <TabsContext.Provider value={{ active, setActive }}>
+      <div>{children}</div>
+    </TabsContext.Provider>
+  );
+}
+
+function TabList({ children }) {
+  return <div role="tablist" className="flex gap-2">{children}</div>;
+}
+
+function Tab({ value, children }) {
+  const { active, setActive } = useContext(TabsContext);
+  return (
+    <button
+      role="tab"
+      aria-selected={active === value}
+      onClick={() => setActive(value)}
+      className={active === value ? "border-b-2" : ""}
+    >
+      {children}
+    </button>
+  );
+}
+
+function TabPanel({ value, children }) {
+  const { active } = useContext(TabsContext);
+  if (active !== value) return null;
+  return <div role="tabpanel">{children}</div>;
+}
+```
+
+Usage is clean and declarative:
+
+```tsx
+<Tabs defaultTab="one">
+  <TabList>
+    <Tab value="one">Tab 1</Tab>
+    <Tab value="two">Tab 2</Tab>
+  </TabList>
+  <TabPanel value="one">Content 1</TabPanel>
+  <TabPanel value="two">Content 2</TabPanel>
+</Tabs>
+```
+
+## Custom Hooks for Logic Reuse
+
+Extract complex logic into custom hooks:
+
+```tsx
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : initialValue;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}
+```
+
+## Container / Presentation Split
+
+Separate data logic from UI rendering:
+
+```tsx
+// Container — handles data
+function UserListContainer() {
+  const { data, loading, error } = useFetch("/api/users");
+  if (loading) return <Skeleton />;
+  if (error) return <ErrorMessage error={error} />;
+  return <UserList users={data} />;
+}
+
+// Presentation — pure UI
+function UserList({ users }) {
+  return (
+    <ul>
+      {users.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## Key Takeaways
+
+- **Compound Components** for flexible, declarative APIs
+- **Custom Hooks** for reusable stateful logic
+- **Container/Presentation** for clear separation of concerns
+
+These patterns scale well and keep your React code maintainable as projects grow.

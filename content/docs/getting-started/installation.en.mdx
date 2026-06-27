@@ -1,0 +1,83 @@
+---
+title: "Installation"
+date: "2026-06-19"
+description: "How to set up the development environment and run this site locally."
+tags: ["getting-started", "setup"]
+---
+
+This guide walks you through setting up the development environment.
+
+## Prerequisites
+
+Make sure you have the following installed:
+
+- **Node.js** 18.17 or later
+- **npm** 9+ (or yarn/pnpm)
+
+## Clone & Install
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/your-site.git
+cd your-site
+
+# Install dependencies
+npm install
+```
+
+## Development
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+
+```
+content/           ← MDX content files
+  blog/            ← Blog posts (*.en.mdx, *.zh.mdx)
+  docs/            ← Documentation pages
+src/
+  app/             ← Next.js App Router pages
+  components/      ← React components
+  lib/             ← Utility functions
+  i18n/            ← Translation files
+```
+
+## Writing Content
+
+Create new `.mdx` files in the `content/` directory:
+
+```bash
+# New blog post
+content/blog/my-post.en.mdx
+content/blog/my-post.zh.mdx
+
+# New doc page
+content/docs/guides/my-guide.en.mdx
+content/docs/guides/my-guide.zh.mdx
+```
+
+Each file needs frontmatter at the top:
+
+```yaml
+---
+title: "Your Post Title"
+date: "2026-06-19"
+description: "A brief description."
+tags: ["tag1", "tag2"]
+---
+```
+
+## Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+The site generates static pages at build time for optimal performance.

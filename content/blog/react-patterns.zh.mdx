@@ -1,0 +1,116 @@
+---
+title: "常见 React 设计模式"
+date: "2026-06-17"
+description: "React 核心设计模式概览：复合组件、Render Props、自定义 Hook 等。"
+tags: ["react", "patterns", "architecture"]
+---
+
+React 的组件模型支持多种强大的设计模式。以下是我最常用的一些。
+
+## 复合组件
+
+复合组件让你创建灵活的 API，父组件和子组件之间共享隐式状态：
+
+```tsx
+import { createContext, useContext, useState } from "react";
+
+const TabsContext = createContext(null);
+
+function Tabs({ children, defaultTab }) {
+  const [active, setActive] = useState(defaultTab);
+  return (
+    <TabsContext.Provider value={{ active, setActive }}>
+      <div>{children}</div>
+    </TabsContext.Provider>
+  );
+}
+
+function TabList({ children }) {
+  return <div role="tablist" className="flex gap-2">{children}</div>;
+}
+
+function Tab({ value, children }) {
+  const { active, setActive } = useContext(TabsContext);
+  return (
+    <button
+      role="tab"
+      aria-selected={active === value}
+      onClick={() => setActive(value)}
+      className={active === value ? "border-b-2" : ""}
+    >
+      {children}
+    </button>
+  );
+}
+
+function TabPanel({ value, children }) {
+  const { active } = useContext(TabsContext);
+  if (active !== value) return null;
+  return <div role="tabpanel">{children}</div>;
+}
+```
+
+使用方式简洁且声明式：
+
+```tsx
+<Tabs defaultTab="one">
+  <TabList>
+    <Tab value="one">标签 1</Tab>
+    <Tab value="two">标签 2</Tab>
+  </TabList>
+  <TabPanel value="one">内容 1</TabPanel>
+  <TabPanel value="two">内容 2</TabPanel>
+</Tabs>
+```
+
+## 自定义 Hook 复用逻辑
+
+将复杂逻辑提取到自定义 Hook 中：
+
+```tsx
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : initialValue;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+}
+```
+
+## 容器/展示组件分离
+
+将数据逻辑与 UI 渲染分离：
+
+```tsx
+// 容器组件 — 处理数据
+function UserListContainer() {
+  const { data, loading, error } = useFetch("/api/users");
+  if (loading) return <Skeleton />;
+  if (error) return <ErrorMessage error={error} />;
+  return <UserList users={data} />;
+}
+
+// 展示组件 — 纯 UI
+function UserList({ users }) {
+  return (
+    <ul>
+      {users.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## 核心要点
+
+- **复合组件** — 构建灵活、声明式的 API
+- **自定义 Hook** — 复用有状态逻辑
+- **容器/展示分离** — 清晰的关注点分离
+
+这些模式具有良好的扩展性，能让 React 项目在规模增长时依然保持可维护性。

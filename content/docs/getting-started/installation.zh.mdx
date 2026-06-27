@@ -1,0 +1,83 @@
+---
+title: "安装与配置"
+date: "2026-06-19"
+description: "如何搭建开发环境并在本地运行本站。"
+tags: ["getting-started", "setup"]
+---
+
+本指南将引导你完成开发环境的搭建。
+
+## 前置要求
+
+确保已安装以下工具：
+
+- **Node.js** 18.17 或更高版本
+- **npm** 9+（或 yarn/pnpm）
+
+## 克隆与安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/your-username/your-site.git
+cd your-site
+
+# 安装依赖
+npm install
+```
+
+## 开发模式
+
+启动开发服务器：
+
+```bash
+npm run dev
+```
+
+在浏览器中打开 [http://localhost:3000](http://localhost:3000)。
+
+## 项目结构
+
+```
+content/           ← MDX 内容文件
+  blog/            ← 博客文章 (*.en.mdx, *.zh.mdx)
+  docs/            ← 文档页面
+src/
+  app/             ← Next.js App Router 页面
+  components/      ← React 组件
+  lib/             ← 工具函数
+  i18n/            ← 翻译文件
+```
+
+## 编写内容
+
+在 `content/` 目录中创建新的 `.mdx` 文件：
+
+```bash
+# 新博客文章
+content/blog/my-post.en.mdx
+content/blog/my-post.zh.mdx
+
+# 新文档页面
+content/docs/guides/my-guide.en.mdx
+content/docs/guides/my-guide.zh.mdx
+```
+
+每个文件需要在顶部包含 frontmatter：
+
+```yaml
+---
+title: "文章标题"
+date: "2026-06-19"
+description: "简要描述。"
+tags: ["标签1", "标签2"]
+---
+```
+
+## 生产构建
+
+```bash
+npm run build
+npm start
+```
+
+站点在构建时生成静态页面，以获得最佳性能。

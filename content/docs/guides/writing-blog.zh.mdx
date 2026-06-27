@@ -1,0 +1,79 @@
+---
+title: "撰写博客文章"
+date: "2026-06-18"
+description: "使用 MDX 创建和格式化博客文章的指南。"
+tags: ["guides", "blog"]
+---
+
+本指南介绍如何在本站撰写和发布博客文章。
+
+## 文件命名
+
+博客文章存放在 `content/blog/` 目录下，命名格式为：
+
+```
+{slug}.{lang}.mdx
+```
+
+示例：
+- `my-first-post.en.mdx`（英文）
+- `my-first-post.zh.mdx`（中文）
+
+`{slug}` 将成为 URL 路径：`/blog/my-first-post`
+
+## Frontmatter
+
+每篇文章必须以 YAML frontmatter 开头：
+
+```yaml
+---
+title: "文章标题"
+date: "2026-06-19"
+description: "简要描述，显示在文章列表和搜索结果中。"
+tags: ["react", "nextjs", "tutorial"]
+---
+```
+
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| `title` | ✅ | 文章标题，显示在页面上 |
+| `date` | ✅ | 发布日期（YYYY-MM-DD） |
+| `description` | ✅ | 摘要，用于卡片和搜索 |
+| `tags` | ❌ | 标签数组，用于筛选 |
+
+## 编写内容
+
+frontmatter 之后，使用标准 Markdown 编写，可选使用 JSX：
+
+### 代码块
+
+使用带语言标识的围栏代码块：
+
+````markdown
+```tsx
+function Hello() {
+  return <h1>你好！</h1>;
+}
+```
+````
+
+支持的语言包括：`tsx`、`ts`、`js`、`jsx`、`bash`、`json`、`css`、`html`、`python`、`rust` 等。
+
+### 链接与图片
+
+```markdown
+[链接文本](https://example.com)
+![替代文本](/images/photo.jpg)
+```
+
+### 表格
+
+```markdown
+| 列 1 | 列 2 |
+|------|------|
+| 单元格 1 | 单元格 2 |
+```
+
+## 双语文章
+
+请为每篇文章同时创建 `.en.mdx` 和 `.zh.mdx` 文件。导航栏中的语言切换按钮会在两者之间切换。
