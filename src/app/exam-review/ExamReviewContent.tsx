@@ -47,10 +47,6 @@ export default function ExamReviewContent({ subjects }: Props) {
           const isDesktop = Boolean(conditions.isDesktop);
           const duration = reduceMotion ? 0 : 0.82;
 
-          gsap.set([".review-orb", ".subject-card"], {
-            willChange: "transform, opacity",
-          });
-
           const intro = gsap.timeline({
             defaults: { duration, ease: "power3.out" },
           });
@@ -73,6 +69,7 @@ export default function ExamReviewContent({ subjects }: Props) {
               x: (index) => (index === 1 ? 12 : -10),
               duration: (index) => 4.8 + index,
               ease: "sine.inOut",
+              force3D: true,
               repeat: -1,
               yoyo: true,
               stagger: 0.2,
@@ -88,8 +85,8 @@ export default function ExamReviewContent({ subjects }: Props) {
 
   return (
     <main ref={scope} className="relative overflow-hidden">
-      <div className="review-orb pointer-events-none absolute left-10 top-28 h-40 w-40 rounded-full bg-cyan-400/18 blur-3xl dark:bg-cyan-400/14" />
-      <div className="review-orb pointer-events-none absolute right-6 top-52 h-56 w-56 rounded-full bg-indigo-500/16 blur-3xl dark:bg-indigo-500/18" />
+      <div className="review-orb gpu-float pointer-events-none absolute left-10 top-28 h-40 w-40 rounded-full bg-cyan-400/18 blur-3xl dark:bg-cyan-400/14" />
+      <div className="review-orb gpu-float pointer-events-none absolute right-6 top-52 h-56 w-56 rounded-full bg-indigo-500/16 blur-3xl dark:bg-indigo-500/18" />
 
       <section className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_22rem] lg:items-start">

@@ -41,10 +41,6 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
           const isDesktop = Boolean(conditions.isDesktop);
           const duration = reduceMotion ? 0 : 0.8;
 
-          gsap.set([".subject-orb", ".subject-panel", ".subject-metric"], {
-            willChange: "transform, opacity",
-          });
-
           const intro = gsap.timeline({
             defaults: { duration, ease: "power3.out" },
           });
@@ -61,6 +57,7 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
               y: (index) => (index % 2 === 0 ? -14 : 14),
               duration: (index) => 4.6 + index,
               ease: "sine.inOut",
+              force3D: true,
               repeat: -1,
               yoyo: true,
             });
@@ -119,8 +116,8 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
 
   return (
     <main ref={scope} className="relative overflow-hidden">
-      <div className="subject-orb pointer-events-none absolute left-8 top-20 h-40 w-40 rounded-full bg-cyan-400/15 blur-3xl dark:bg-cyan-400/14" />
-      <div className="subject-orb pointer-events-none absolute right-10 top-36 h-52 w-52 rounded-full bg-indigo-500/14 blur-3xl dark:bg-indigo-500/18" />
+      <div className="subject-orb gpu-float pointer-events-none absolute left-8 top-20 h-40 w-40 rounded-full bg-cyan-400/15 blur-3xl dark:bg-cyan-400/14" />
+      <div className="subject-orb gpu-float pointer-events-none absolute right-10 top-36 h-52 w-52 rounded-full bg-indigo-500/14 blur-3xl dark:bg-indigo-500/18" />
 
       <section className="mx-auto max-w-6xl px-6 py-16">
         <Link

@@ -84,10 +84,6 @@ export default function HomeContent({ postsEn, postsZh }: Props) {
           const isDesktop = Boolean(conditions.isDesktop);
           const duration = reduceMotion ? 0 : 0.82;
 
-          gsap.set([".home-orb", ".home-card"], {
-            willChange: "transform, opacity",
-          });
-
           const intro = gsap.timeline({
             defaults: { duration, ease: "power3.out" },
           });
@@ -105,6 +101,7 @@ export default function HomeContent({ postsEn, postsZh }: Props) {
               x: (index) => (index === 0 ? -10 : 12),
               duration: (index) => 4.8 + index,
               ease: "sine.inOut",
+              force3D: true,
               repeat: -1,
               yoyo: true,
             });
@@ -119,8 +116,8 @@ export default function HomeContent({ postsEn, postsZh }: Props) {
 
   return (
     <div ref={scope} className="relative overflow-hidden">
-      <div className="home-orb pointer-events-none absolute left-10 top-10 h-40 w-40 rounded-full bg-cyan-400/18 blur-3xl dark:bg-cyan-400/12" />
-      <div className="home-orb pointer-events-none absolute right-0 top-36 h-56 w-56 rounded-full bg-indigo-500/14 blur-3xl dark:bg-indigo-500/18" />
+      <div className="home-orb gpu-float pointer-events-none absolute left-10 top-10 h-40 w-40 rounded-full bg-cyan-400/18 blur-3xl dark:bg-cyan-400/12" />
+      <div className="home-orb gpu-float pointer-events-none absolute right-0 top-36 h-56 w-56 rounded-full bg-indigo-500/14 blur-3xl dark:bg-indigo-500/18" />
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_22rem]">
         <div className="home-card rounded-[34px] border border-white/60 bg-white/78 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/68">
