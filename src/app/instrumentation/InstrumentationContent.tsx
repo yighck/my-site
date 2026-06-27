@@ -20,6 +20,8 @@ interface InstrumentationPlan {
   tuningSteps: string[];
   risks: string[];
   verification: string[];
+  references: string[];
+  detectedFamily: string;
 }
 
 const EXAMPLE_TOPICS = {
@@ -338,6 +340,19 @@ export default function InstrumentationContent() {
                     {t.instrumentation.planSummary}
                   </p>
                   <h3 className="mt-3 text-2xl font-semibold">{plan.title}</h3>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-amber-500/18 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-100">
+                      {plan.detectedFamily}
+                    </span>
+                    {plan.references.map((reference) => (
+                      <span
+                        key={reference}
+                        className="rounded-full bg-white/8 px-3 py-1 text-xs font-medium text-slate-200"
+                      >
+                        {reference}
+                      </span>
+                    ))}
+                  </div>
                   <p className="mt-3 text-sm leading-7 text-slate-200">{plan.summary}</p>
                   <p className="mt-4 rounded-2xl bg-white/6 px-4 py-3 text-sm leading-7 text-slate-100">
                     {plan.approach}

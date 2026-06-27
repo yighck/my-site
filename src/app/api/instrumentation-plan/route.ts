@@ -1,70 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { recommendPlanFromDistilledData } from "@/lib/instrumentation-kb";
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
-
-const responseSchema = {
-  type: "object",
-  additionalProperties: false,
-  required: ["title", "summary", "approach", "modules", "tuningSteps", "risks", "verification"],
-  properties: {
-    title: {
-      type: "string",
-    },
-    summary: {
-      type: "string",
-    },
-    approach: {
-      type: "string",
-    },
-    modules: {
-      type: "array",
-      minItems: 3,
-      maxItems: 6,
-      items: {
-        type: "object",
-        additionalProperties: false,
-        required: ["title", "items"],
-        properties: {
-          title: {
-            type: "string",
-          },
-          items: {
-            type: "array",
-            minItems: 2,
-            maxItems: 5,
-            items: {
-              type: "string",
-            },
-          },
-        },
-      },
-    },
-    tuningSteps: {
-      type: "array",
-      minItems: 3,
-      maxItems: 6,
-      items: {
-        type: "string",
-      },
-    },
-    risks: {
-      type: "array",
-      minItems: 3,
-      maxItems: 6,
-      items: {
-        type: "string",
-      },
-    },
-    verification: {
-      type: "array",
-      minItems: 3,
-      maxItems: 6,
-      items: {
-        type: "string",
-      },
-    },
-  },
-} as const;
 
 interface RequestBody {
   topic?: string;
@@ -72,27 +9,21 @@ interface RequestBody {
   imageDataUrl?: string;
 }
 
-function buildDeveloperPrompt(lang: "en" | "zh") {
+function buildVisionPrompt(lang: "en" | "zh") {
   if (lang === "zh") {
     return [
-      "你是一名全国大学生电子设计竞赛仪器仪表方向顾问。",
-      "用户会输入一道电赛题目、题目截图，或两者同时提供，你需要先从图片中识别题意，再给出可落地的获奖级方案草案。",
-      "输出必须严格贴合输入题目，不要泛泛而谈，不要写备赛建议。",
-      "默认面向 3 人学生队，主控优先考虑 STM32，必要时可以补充 FPGA、K230、上位机或专用芯片，但要说明为什么。",
-      "方案重点放在：题目目标拆解、总体技术路线、关键功能模块、容易翻车的风险点、调试顺序、验收指标。",
-      "如果题目信息不足，允许做少量合理假设，但必须把假设隐含在方案里，不要反问用户。",
-      "语言使用中文，风格直接、专业、可执行。",
+      "你现在只负责识别图片里的电赛题目文字，不负责生成方案。",
+      "请尽量完整提取题目中的目标、指标、限制条件、输入输出要求和判分要点。",
+      "如果图片里有表格、编号或分条要求，请保留结构。",
+      "不要编造缺失内容，不要给建议，只输出提取后的题目文字。",
     ].join("\n");
   }
 
   return [
-    "You are an advisor for instrumentation-style university electronic design contest problems.",
-    "The user may provide a contest problem statement, a screenshot of the problem, or both. Read the screenshot when present, then return an executable solution draft rather than study advice.",
-    "Ground the answer in the stated problem and avoid generic preparation guidance.",
-    "Assume a 3-person student team. Prefer STM32 as the baseline controller, and only introduce FPGA, K230, PC software, or dedicated ICs when they materially help the solution.",
-    "Focus on: goal decomposition, system-level approach, critical modules, failure risks, tuning order, and verification targets.",
-    "If the prompt is incomplete, make only minimal reasonable assumptions and bake them into the plan instead of asking follow-up questions.",
-    "Respond in the user's language when possible.",
+    "You only extract the contest problem text from the image and do not generate a solution.",
+    "Preserve goals, metrics, constraints, input/output requirements, and scoring-relevant details as faithfully as possible.",
+    "If the image contains bullet points or numbered requirements, keep that structure.",
+    "Do not invent missing content and do not add advice.",
   ].join("\n");
 }
 
@@ -136,21 +67,68 @@ function extractOutputText(data: unknown): string | null {
   return null;
 }
 
-export async function POST(request: NextRequest) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      {
-        error: "Server is missing OPENAI_API_KEY. Add it to your deployment environment first.",
-      },
-      { status: 500 },
-    );
+async function extractProblemTextFromImage(
+  apiKey: string,
+  imageDataUrl: string,
+  lang: "en" | "zh",
+  model: string,
+) {
+  const response = await fetch(OPENAI_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      input: [
+        {
+          role: "developer",
+          content: [
+            {
+              type: "input_text",
+              text: buildVisionPrompt(lang),
+            },
+          ],
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_image",
+              image_url: imageDataUrl,
+              detail: "auto",
+            },
+          ],
+        },
+      ],
+    }),
+  });
+
+  const data = (await response.json()) as unknown;
+
+  if (!response.ok) {
+    const message =
+      typeof data === "object" &&
+      data !== null &&
+      "error" in data &&
+      typeof (data as { error?: { message?: unknown } }).error?.message === "string"
+        ? (data as { error: { message: string } }).error.message
+        : "Image recognition failed.";
+
+    throw new Error(message);
   }
 
+  return extractOutputText(data) ?? "";
+}
+
+export async function POST(request: NextRequest) {
   const body = (await request.json()) as RequestBody;
   const topic = body.topic?.trim();
   const lang = body.lang === "zh" ? "zh" : "en";
   const imageDataUrl = body.imageDataUrl?.trim();
+  const apiKey = process.env.OPENAI_API_KEY;
+  const model = process.env.OPENAI_MODEL || "gpt-5.5";
 
   if (!topic && !imageDataUrl) {
     return NextResponse.json(
@@ -164,99 +142,43 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const model = process.env.OPENAI_MODEL || "gpt-5.5";
-
-  const userContent: Array<Record<string, unknown>> = [];
-  if (topic) {
-    userContent.push({
-      type: "input_text",
-      text: topic,
-    });
-  }
-  if (imageDataUrl) {
-    userContent.push({
-      type: "input_image",
-      image_url: imageDataUrl,
-      detail: "auto",
-    });
-  }
-
-  const openAiResponse = await fetch(OPENAI_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      reasoning: {
-        effort: "medium",
-      },
-      input: [
-        {
-          role: "developer",
-          content: [
-            {
-              type: "input_text",
-              text: buildDeveloperPrompt(lang),
-            },
-          ],
-        },
-        {
-          role: "user",
-          content: userContent,
-        },
-      ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: "instrumentation_plan",
-          strict: true,
-          schema: responseSchema,
-        },
-      },
-    }),
-  });
-
-  const data = (await openAiResponse.json()) as unknown;
-
-  if (!openAiResponse.ok) {
-    const message =
-      typeof data === "object" &&
-      data !== null &&
-      "error" in data &&
-      typeof (data as { error?: { message?: unknown } }).error?.message === "string"
-        ? ((data as { error: { message: string } }).error.message)
-        : "OpenAI request failed.";
-
-    return NextResponse.json({ error: message }, { status: openAiResponse.status });
-  }
-
-  const outputText = extractOutputText(data);
-  if (!outputText) {
+  if (imageDataUrl && !apiKey && !topic) {
     return NextResponse.json(
       {
         error:
           lang === "zh"
-            ? "模型没有返回可解析的方案内容，请稍后重试。"
-            : "The model did not return a parseable plan. Please try again.",
+            ? "当前只上传图片时需要配置 OPENAI_API_KEY 用于识图。"
+            : "Image-only input requires OPENAI_API_KEY for OCR.",
       },
-      { status: 502 },
+      { status: 500 },
     );
   }
 
-  try {
-    const plan = JSON.parse(outputText);
-    return NextResponse.json({ plan });
-  } catch {
-    return NextResponse.json(
-      {
-        error:
-          lang === "zh"
-            ? "模型输出格式异常，请稍后重试。"
-            : "The model returned an unexpected format. Please try again.",
-      },
-      { status: 502 },
-    );
+  let mergedTopic = topic ?? "";
+
+  if (imageDataUrl && apiKey) {
+    try {
+      const extracted = await extractProblemTextFromImage(apiKey, imageDataUrl, lang, model);
+      if (extracted.trim()) {
+        mergedTopic = mergedTopic ? `${mergedTopic}\n\n${extracted.trim()}` : extracted.trim();
+      }
+    } catch (error) {
+      if (!mergedTopic) {
+        return NextResponse.json(
+          {
+            error:
+              error instanceof Error
+                ? error.message
+                : lang === "zh"
+                  ? "题目图片识别失败，请稍后重试。"
+                  : "Failed to read the problem image. Please try again.",
+          },
+          { status: 502 },
+        );
+      }
+    }
   }
+
+  const plan = recommendPlanFromDistilledData(mergedTopic, lang);
+  return NextResponse.json({ plan });
 }
