@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Site
 
-## Getting Started
+This project is a `Next.js` site with a server-side instrumentation problem solver.
 
-First, run the development server:
+## Local development
+
+1. Copy `.env.example` to `.env.local`
+2. Fill in `OPENAI_API_KEY`
+3. Optionally set `OPENAI_MODEL`
+4. Run:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Instrumentation solver
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The page at `/instrumentation` accepts a contest problem statement and calls the
+OpenAI Responses API on the server to generate a structured solution draft.
 
-## Learn More
+## Environment variables
 
-To learn more about Next.js, take a look at the following resources:
+- `OPENAI_API_KEY`
+  Required. Server-side API key for OpenAI.
+- `OPENAI_MODEL`
+  Optional. Defaults to `gpt-5.4-mini`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This app now requires a runtime that supports Next.js server routes.
 
-## Deploy on Vercel
+Recommended targets:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Vercel
+- Railway
+- Render
+- A self-hosted Node.js environment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+GitHub Pages static export is no longer suitable because the solver uses a
+server-side API route at `src/app/api/instrumentation-plan/route.ts`.
