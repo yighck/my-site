@@ -3,12 +3,13 @@
     "blog": "Blog",
     "docs": "Docs",
     "exam": "Final Review",
+    "instrumentation": "Instrumentation",
     "getStarted": "Home",
     "siteName": "My Blog"
   },
   "home": {
     "greeting": "Hi, I'm a developer",
-    "intro": "Personal blog and knowledge base. I write about web development, React, Next.js, and things I learn along the way.",
+    "intro": "Personal blog and knowledge base. I write about web development, React, Next.js, and the systems I build while learning.",
     "recentPosts": "Recent Posts",
     "viewAll": "View all ->",
     "quickLinks": "Quick Links",
@@ -16,14 +17,15 @@
     "docsInstall": "Installation",
     "docsBlog": "Writing Blog Posts",
     "docsAddDocs": "Adding Documentation",
+    "instrumentationHub": "NUEDC Instrumentation Hub",
     "hubLabel": "Knowledge Hub",
     "heroHeadline": "Turn learning into durable assets",
     "contentLabel": "Content System",
     "contentHeadline": "This site now behaves like a workspace",
     "recentLabel": "Recent Posts",
     "quickLabel": "Quick Access",
-    "docsEntry": "Docs Entry",
-    "openDocument": "Open document ->"
+    "docsEntry": "Entry",
+    "openDocument": "Open ->"
   },
   "blog": {
     "title": "Blog",
@@ -106,6 +108,32 @@
     "quizRetry": "Review again",
     "showExplanation": "Show explanation",
     "hideExplanation": "Hide explanation"
+  },
+  "instrumentation": {
+    "badge": "NUEDC Instrumentation",
+    "heroLine1": "Turn instrumentation prep",
+    "heroLine2": "into one contest-ready system",
+    "heroCopy": "This topic page is built for measurement-style electronic design problems: unify hardware, firmware, calibration, and contest workflow so the team can reuse one platform instead of restarting from zero each time.",
+    "badgeHardware": "motherboard blueprint",
+    "badgeAlgorithms": "measurement algorithms",
+    "badgeContest": "6-week sprint",
+    "badgePlatform": "reusable STM32 interface",
+    "statFamilies": "core problem families",
+    "statWeeks": "weeks in the sprint",
+    "statPlatform": "shared platform backbone",
+    "principleLabel": "Winning Order",
+    "principleTitle": "The sequence to lock before coding hard",
+    "principle1": "Lock the measurement principle and front-end range before chasing algorithms.",
+    "principle2": "Lock the sampling clock, reference path, and calibration chain before tuning metrics.",
+    "principle3": "Lock diagnostics, prompts, and repeatability before mock-contest delivery.",
+    "familiesLabel": "Problem Families",
+    "familiesTitle": "Four instrumentation tracks that keep coming back",
+    "roadmapLabel": "Training Sprint",
+    "roadmapTitle": "A focused 1-2 month roadmap",
+    "platformLabel": "Reusable Platform",
+    "platformTitle": "Six fixed firmware interfaces",
+    "testingLabel": "Verification Rhythm",
+    "testingTitle": "Checks that keep the platform honest"
   },
   "footer": {
     "copyright": "(c) {year} My Blog. Built with Next.js and Tailwind CSS."

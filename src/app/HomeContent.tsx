@@ -41,32 +41,39 @@ export default function HomeContent({ postsEn, postsZh }: Props) {
       title: t.home.docsAddDocs,
       path: "/docs/guides/adding-docs",
     },
+    {
+      href: "/instrumentation",
+      title: t.home.instrumentationHub,
+      path: "/instrumentation",
+    },
   ];
 
   const statCards =
     lang === "zh"
       ? [
-          { value: "3", label: "篇最近文章优先浏览" },
-          { value: "2", label: "条主线内容并行建设" },
-          { value: "1", label: "个统一的知识入口" },
+          { value: "3", label: "主要内容栏目" },
+          { value: "5", label: "首页快速入口" },
+          { value: "1", label: "统一知识入口" },
         ]
       : [
-          { value: "3", label: "recent posts highlighted" },
-          { value: "2", label: "major content tracks" },
+          { value: "3", label: "major content tracks" },
+          { value: "5", label: "quick access links" },
           { value: "1", label: "unified knowledge entry point" },
         ];
 
   const asidePoints =
     lang === "zh"
       ? [
-          "博客区记录技术笔记、项目沉淀和实践经验。",
-          "文档区更适合按主题系统阅读和长期整理。",
-          "复习区专门承接课程冲刺与考试前的快速回顾。",
+          "博客区记录技术笔记、项目经验和实践复盘。",
+          "文档区更适合做结构化、长期沉淀的知识整理。",
+          "期末复习栏目专门服务课程冲刺和考前回顾。",
+          "电赛仪器仪表专题把题型、平台和训练节奏压成一页作战板。",
         ]
       : [
           "The blog captures notes, projects, and practical lessons.",
           "The docs area is better for structured, long-term reference.",
           "The review zone is tuned for fast finals prep and recap.",
+          "The instrumentation hub compresses NUEDC measurement problems into one reusable playbook.",
         ];
 
   useGSAP(
@@ -194,11 +201,7 @@ export default function HomeContent({ postsEn, postsZh }: Props) {
         <div className="grid gap-6 lg:grid-cols-3">
           {posts.map((post) => (
             <div key={post.slug} className="home-card">
-              <PostCard
-                slug={post.slug}
-                frontmatter={post.frontmatter}
-                lang={lang}
-              />
+              <PostCard slug={post.slug} frontmatter={post.frontmatter} lang={lang} />
             </div>
           ))}
         </div>
@@ -214,7 +217,7 @@ export default function HomeContent({ postsEn, postsZh }: Props) {
           </h2>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {quickLinks.map((link) => (
             <Link
               key={link.href}

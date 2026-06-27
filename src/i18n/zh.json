@@ -3,12 +3,13 @@
     "blog": "博客",
     "docs": "文档",
     "exam": "期末复习",
+    "instrumentation": "电赛仪器仪表",
     "getStarted": "首页",
     "siteName": "我的博客"
   },
   "home": {
-    "greeting": "你好，我是一名开发者",
-    "intro": "这里是我的个人博客和知识库，主要记录 Web 开发、React、Next.js，以及学习过程中的笔记与总结。",
+    "greeting": "你好，我在这里整理学习与项目",
+    "intro": "这里是我的个人博客和知识站，记录 Web 开发、React、Next.js，以及阶段性的专题整理与复盘。",
     "recentPosts": "最新文章",
     "viewAll": "查看全部 ->",
     "quickLinks": "快速入口",
@@ -16,14 +17,15 @@
     "docsInstall": "安装与配置",
     "docsBlog": "撰写博客文章",
     "docsAddDocs": "添加文档",
+    "instrumentationHub": "电赛仪器仪表专题",
     "hubLabel": "知识中枢",
     "heroHeadline": "把学习内容做成长期资产",
     "contentLabel": "内容结构",
-    "contentHeadline": "现在这个站点更像一套工作台",
+    "contentHeadline": "现在这个站点更像一套个人工作台",
     "recentLabel": "最新文章",
     "quickLabel": "快速入口",
-    "docsEntry": "文档入口",
-    "openDocument": "打开文档 ->"
+    "docsEntry": "入口",
+    "openDocument": "打开 ->"
   },
   "blog": {
     "title": "博客",
@@ -63,7 +65,7 @@
     "featureConcepts": "概念卡片",
     "featurePractice": "练习题",
     "featureTips": "复习提示",
-    "statSubjects": "门课程已经整理",
+    "statSubjects": "门课程已整理",
     "statModes": "种复习模块并行推进",
     "statWorkflow": "条清晰的考前冲刺路径",
     "studyRhythmLabel": "复习节奏",
@@ -96,9 +98,9 @@
     "tabPractice": "练习题",
     "tabTips": "复习提示",
     "conceptLabel": "概念卡",
-    "conceptHint": "点击翻到背面，看定义和要点。",
+    "conceptHint": "点击翻到背面，查看定义和要点。",
     "conceptFront": "正面",
-    "conceptBack": "反面",
+    "conceptBack": "背面",
     "definitionLabel": "定义",
     "conceptReturn": "再次点击返回",
     "questionLabel": "第 {number} 题",
@@ -107,8 +109,34 @@
     "showExplanation": "查看解析",
     "hideExplanation": "收起解析"
   },
+  "instrumentation": {
+    "badge": "电赛仪器仪表",
+    "heroLine1": "把仪器仪表备赛",
+    "heroLine2": "做成一套可复用的作战系统",
+    "heroCopy": "这个专题页面面向电子设计竞赛里的仪器仪表类题目：把硬件、固件、标定和比赛流程捏成一条可复用链路，而不是每道题都从零开始。",
+    "badgeHardware": "母板蓝图",
+    "badgeAlgorithms": "测量算法",
+    "badgeContest": "6 周冲刺",
+    "badgePlatform": "可复用 STM32 接口",
+    "statFamilies": "核心题型主线",
+    "statWeeks": "训练周期节奏",
+    "statPlatform": "一套共用平台",
+    "principleLabel": "夺奖顺序",
+    "principleTitle": "在大量写代码前先锁定的三件事",
+    "principle1": "先锁定测量原理和前端量程，再追算法。",
+    "principle2": "先锁定采样时钟、参考通道和标定链路，再调指标。",
+    "principle3": "先锁定异常提示、交互和复测稳定性，再做比赛演示。",
+    "familiesLabel": "题型图谱",
+    "familiesTitle": "反复出现的四条仪器仪表主线",
+    "roadmapLabel": "训练节奏",
+    "roadmapTitle": "一条 1-2 个月的专项备赛路线",
+    "platformLabel": "复用平台",
+    "platformTitle": "固定的 6 个固件接口",
+    "testingLabel": "验证节奏",
+    "testingTitle": "让平台始终说实话的检查清单"
+  },
   "footer": {
     "copyright": "(c) {year} 我的博客。使用 Next.js 和 Tailwind CSS 构建。"
   },
-  "lang": "中"
+  "lang": "中文"
 }

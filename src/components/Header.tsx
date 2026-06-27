@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { key: "blog", href: "/blog" },
   { key: "docs", href: "/docs" },
   { key: "exam", href: "/exam-review" },
+  { key: "instrumentation", href: "/instrumentation" },
 ] as const;
 
 export default function Header({ searchItems }: Props) {
@@ -55,7 +56,7 @@ export default function Header({ searchItems }: Props) {
             onClick={toggle}
             className="rounded-full border border-slate-300/80 px-3 py-1.5 text-xs font-semibold tracking-[0.18em] text-slate-700 transition-colors hover:bg-white dark:border-white/12 dark:text-slate-200 dark:hover:bg-white/8"
           >
-            {lang === "en" ? "中" : "EN"}
+            {lang === "en" ? "中文" : "EN"}
           </button>
         </div>
       </div>
