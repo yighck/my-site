@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
-    "@next/swc-win32-x64-msvc": "^16.2.9",
     "@shikijs/langs": "^4.2.0",
     "@shikijs/themes": "^4.2.0",
     "fuse.js": "^7.4.2",
