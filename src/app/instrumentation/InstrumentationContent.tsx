@@ -39,6 +39,7 @@ export default function InstrumentationContent() {
   const { lang, t } = useTranslation();
   const scope = useRef<HTMLElement>(null);
   const [topic, setTopic] = useState("");
+  const [imageDataUrl, setImageDataUrl] = useState("");
   const [plan, setPlan] = useState<InstrumentationPlan | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -93,7 +94,7 @@ export default function InstrumentationContent() {
     event.preventDefault();
 
     const trimmed = topic.trim();
-    if (!trimmed) {
+    if (!trimmed && !imageDataUrl) {
       setError(t.instrumentation.emptyTopic);
       return;
     }
@@ -111,6 +112,7 @@ export default function InstrumentationContent() {
         body: JSON.stringify({
           topic: trimmed,
           lang,
+          imageDataUrl,
         }),
       });
 
@@ -132,6 +134,37 @@ export default function InstrumentationContent() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setError(t.instrumentation.imageTypeError);
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError(t.instrumentation.imageSizeError);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        setImageDataUrl(result);
+        setError("");
+      }
+    };
+    reader.onerror = () => {
+      setError(t.instrumentation.imageReadError);
+    };
+    reader.readAsDataURL(file);
+    event.target.value = "";
   }
 
   return (
@@ -196,6 +229,51 @@ export default function InstrumentationContent() {
                 placeholder={t.instrumentation.placeholder}
                 className="min-h-56 w-full rounded-[28px] border border-slate-200/80 bg-slate-50/90 px-5 py-4 text-sm leading-7 text-slate-700 outline-none transition-colors focus:border-amber-300 focus:bg-white dark:border-white/10 dark:bg-white/6 dark:text-slate-100 dark:focus:border-amber-400/60"
               />
+
+              <div className="rounded-[28px] border border-dashed border-slate-300/80 bg-slate-50/70 p-5 dark:border-white/12 dark:bg-white/6">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                      {t.instrumentation.imageLabel}
+                    </p>
+                    <p className="mt-1 text-sm leading-7 text-slate-500 dark:text-slate-400">
+                      {t.instrumentation.imageHint}
+                    </p>
+                  </div>
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-800 dark:bg-amber-300 dark:text-slate-950 dark:hover:bg-amber-200">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+                    {imageDataUrl ? t.instrumentation.imageReplace : t.instrumentation.imageUpload}
+                  </label>
+                </div>
+
+                {imageDataUrl ? (
+                  <div className="mt-5 overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-3 dark:border-white/10 dark:bg-slate-950/70">
+                    {/* Preview the uploaded problem screenshot before submission. */}
+                    <img
+                      src={imageDataUrl}
+                      alt={t.instrumentation.imageAlt}
+                      className="max-h-80 w-full rounded-[18px] object-contain"
+                    />
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                        {t.instrumentation.imageReady}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setImageDataUrl("")}
+                        className="rounded-full border border-slate-200/80 px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors hover:border-rose-300 hover:text-rose-600 dark:border-white/10 dark:text-slate-300 dark:hover:border-rose-400/40 dark:hover:text-rose-300"
+                      >
+                        {t.instrumentation.imageRemove}
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
 
               <div className="flex flex-wrap gap-3">
                 {examples.map((example) => (

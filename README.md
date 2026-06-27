@@ -18,15 +18,16 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Instrumentation solver
 
-The page at `/instrumentation` accepts a contest problem statement and calls the
-OpenAI Responses API on the server to generate a structured solution draft.
+The page at `/instrumentation` accepts a contest problem statement, a problem
+image, or both, and calls the OpenAI Responses API on the server to generate a
+structured solution draft.
 
 ## Environment variables
 
 - `OPENAI_API_KEY`
   Required. Server-side API key for OpenAI.
 - `OPENAI_MODEL`
-  Optional. Defaults to `gpt-5.4-mini`.
+  Optional. Defaults to `gpt-5.5`.
 
 ## Deployment
 

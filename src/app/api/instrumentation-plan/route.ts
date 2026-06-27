@@ -69,13 +69,14 @@ const responseSchema = {
 interface RequestBody {
   topic?: string;
   lang?: "en" | "zh";
+  imageDataUrl?: string;
 }
 
 function buildDeveloperPrompt(lang: "en" | "zh") {
   if (lang === "zh") {
     return [
       "你是一名全国大学生电子设计竞赛仪器仪表方向顾问。",
-      "用户会输入一道电赛题目或题目描述，你需要给出可落地的获奖级方案草案。",
+      "用户会输入一道电赛题目、题目截图，或两者同时提供，你需要先从图片中识别题意，再给出可落地的获奖级方案草案。",
       "输出必须严格贴合输入题目，不要泛泛而谈，不要写备赛建议。",
       "默认面向 3 人学生队，主控优先考虑 STM32，必要时可以补充 FPGA、K230、上位机或专用芯片，但要说明为什么。",
       "方案重点放在：题目目标拆解、总体技术路线、关键功能模块、容易翻车的风险点、调试顺序、验收指标。",
@@ -86,7 +87,7 @@ function buildDeveloperPrompt(lang: "en" | "zh") {
 
   return [
     "You are an advisor for instrumentation-style university electronic design contest problems.",
-    "The user will paste a contest problem statement or a short description. Return an executable solution draft rather than study advice.",
+    "The user may provide a contest problem statement, a screenshot of the problem, or both. Read the screenshot when present, then return an executable solution draft rather than study advice.",
     "Ground the answer in the stated problem and avoid generic preparation guidance.",
     "Assume a 3-person student team. Prefer STM32 as the baseline controller, and only introduce FPGA, K230, PC software, or dedicated ICs when they materially help the solution.",
     "Focus on: goal decomposition, system-level approach, critical modules, failure risks, tuning order, and verification targets.",
@@ -149,17 +150,36 @@ export async function POST(request: NextRequest) {
   const body = (await request.json()) as RequestBody;
   const topic = body.topic?.trim();
   const lang = body.lang === "zh" ? "zh" : "en";
+  const imageDataUrl = body.imageDataUrl?.trim();
 
-  if (!topic) {
+  if (!topic && !imageDataUrl) {
     return NextResponse.json(
       {
-        error: lang === "zh" ? "请输入题目描述后再生成方案。" : "Please enter a problem statement first.",
+        error:
+          lang === "zh"
+            ? "请至少提供题目文字或题目截图。"
+            : "Please provide either a problem statement or a problem image.",
       },
       { status: 400 },
     );
   }
 
-  const model = process.env.OPENAI_MODEL || "gpt-5.4-mini";
+  const model = process.env.OPENAI_MODEL || "gpt-5.5";
+
+  const userContent: Array<Record<string, unknown>> = [];
+  if (topic) {
+    userContent.push({
+      type: "input_text",
+      text: topic,
+    });
+  }
+  if (imageDataUrl) {
+    userContent.push({
+      type: "input_image",
+      image_url: imageDataUrl,
+      detail: "auto",
+    });
+  }
 
   const openAiResponse = await fetch(OPENAI_API_URL, {
     method: "POST",
@@ -184,12 +204,7 @@ export async function POST(request: NextRequest) {
         },
         {
           role: "user",
-          content: [
-            {
-              type: "input_text",
-              text: topic,
-            },
-          ],
+          content: userContent,
         },
       ],
       text: {
