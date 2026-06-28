@@ -9,8 +9,6 @@ export interface InstrumentationPlan {
   overview: string;
   modules: PlanSection[];
   tuningSteps: string[];
-  risks: string[];
-  verification: string[];
 }
 
 export interface PlanMeta {

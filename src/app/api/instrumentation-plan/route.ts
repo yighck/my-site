@@ -78,8 +78,6 @@ interface SimplePlan {
   overview: string;
   modules: SimplePlanSection[];
   tuningSteps: string[];
-  risks: string[];
-  verification: string[];
 }
 
 interface PlanResponseMeta {
@@ -296,10 +294,25 @@ function ensureList(items: string[] | undefined, fallback: string[]) {
   return items && items.length ? items : fallback;
 }
 
+function formatDetailBlock(prefix: string, items: string[] | undefined) {
+  if (!items?.length) {
+    return "";
+  }
+
+  return `${prefix}${items.join("；")}。`;
+}
+
 function simplifyPlan(plan: RecommendedPlan): SimplePlan {
   const referencesText = plan.references?.length ? `参考题源：${plan.references.join("、")}。` : "";
   const matchedText = plan.matchedTerms?.length ? `识别关键词：${plan.matchedTerms.join("、")}。` : "";
   const reasoningText = plan.reasoning?.length ? `判断依据：${plan.reasoning.join("；")}。` : "";
+  const moduleSummaryText = plan.modules?.length
+    ? `建议优先按以下模块搭建：${plan.modules
+        .map((module) => `${module.title}${module.items.length ? `（${module.items.join("、")}）` : ""}`)
+        .join("；")}。`
+    : "";
+  const riskSummaryText = formatDetailBlock("实现时重点注意：", plan.risks);
+  const verificationSummaryText = formatDetailBlock("完成后优先验证：", plan.verification);
 
   return {
     title: plan.title || "电赛题目方案建议",
@@ -310,11 +323,14 @@ function simplifyPlan(plan: RecommendedPlan): SimplePlan {
       reasoningText,
       referencesText,
     ]),
-    overview: joinCleanLines([plan.approach]),
+    overview: joinCleanLines([
+      plan.approach,
+      moduleSummaryText,
+      riskSummaryText,
+      verificationSummaryText,
+    ]),
     modules: plan.modules?.filter((module) => module.items?.length) ?? [],
     tuningSteps: ensureList(plan.tuningSteps, ["先保证主链路可运行，再逐项校准关键指标。"]),
-    risks: ensureList(plan.risks, ["优先关注指标闭环、量程切换和误差来源。"]),
-    verification: ensureList(plan.verification, ["先验证基础功能，再验证边界条件和最终指标。"]),
   };
 }
 

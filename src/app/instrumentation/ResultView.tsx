@@ -99,10 +99,11 @@ export default function ResultView({ plan, planMeta, loading }: Props) {
         </section>
       ) : null}
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="space-y-4">
+        <h4 className="text-sm font-semibold text-amber-200">
+          {INSTRUMENTATION_COPY.tuningLabel}
+        </h4>
         <SectionList title={INSTRUMENTATION_COPY.tuningLabel} items={plan.tuningSteps} />
-        <SectionList title={INSTRUMENTATION_COPY.riskLabel} items={plan.risks} />
-        <SectionList title={INSTRUMENTATION_COPY.verifyLabel} items={plan.verification} />
       </section>
     </div>
   );
