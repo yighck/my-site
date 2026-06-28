@@ -4240,7 +4240,7 @@ function getRichLocalizedText(
   text: { en: string; zh: string },
   lang: "en" | "zh",
 ) {
-  return lang === "zh" ? text.zh : text.en;
+  return text.zh || text.en;
 }
 
 function getFamilyPlaybook(profileId: string, lang: "en" | "zh") {

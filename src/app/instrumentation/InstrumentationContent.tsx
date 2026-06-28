@@ -762,7 +762,7 @@ export default function InstrumentationContent() {
         },
         body: JSON.stringify({
           topic: trimmed,
-          lang,
+          lang: "zh",
           imageDataUrl,
         }),
       });

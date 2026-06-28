@@ -362,6 +362,41 @@ const zhTextOverrides: Record<string, string> = {
   "The same capture chain preserves parameter consistency across moderate sweep expansion or range switching.": "在适度扩展扫频范围或切换量程后，同一采集链路仍能保持参数一致性。",
   "A drifting reference breaks downstream interpretation.": "参考通道一旦漂移，后续解释都会失真。",
   "Probe the source and compare it against the timing reference.": "先直接测信号源，并和时序参考进行对比。",
+  "Keep the object of measurement explicit instead of drifting into generic signal processing.": "始终把测量对象讲清楚，不要漂成泛泛的信号处理题。",
+  "Final output must match the problem's scored quantity rather than a proxy plot.": "最终输出必须对应题目真正评分的量，而不是替代性的示意图。",
+  "Expose at least one intermediate observable that explains the final result.": "至少暴露一个能解释最终结果的中间可观测量。",
+  "One stable bench case is the anchor for all tuning and defense.": "一个稳定台架样例应作为调参和答辩的共同锚点。",
+  "The raw-to-final chain should remain inspectable during the demo.": "演示时应能看清从原始量到最终结果的整条链路。",
+  "One repeatable main metric on a known sample.": "在已知样件上至少拿到一个可复现的主指标。",
+  "One honest boundary statement about unsupported or unstable cases.": "对暂不支持或不稳定的情况要有明确边界说明。",
+  "Reference path": "参考通道",
+  "Range switching integrity": "量程切换完整性",
+  "Amplitude ratio": "幅值比",
+  "Phase shift": "相位差",
+  "Repeatability by range": "分量程重复性",
+  "Known resistor": "已知电阻样件",
+  "Known capacitor": "已知电容样件",
+  "Known inductor": "已知电感样件",
+  "Do not force dense sweep fitting before one stable point works.": "在单个稳定工作点没跑通前，不要强行上复杂扫频拟合。",
+  "Safer than dense sweep, but less expressive than a validated sweep route.": "比大范围扫频拟合更稳，但表达能力不如验证充分的扫频路线。",
+  "Fast provincial-ready parameter tasks.": "适合快速冲省奖的参数测量题。",
+  "Use one stable excitation point and solve from amplitude ratio plus phase shift.": "先锁定一个稳定激励点，再由幅值比和相位差反推出参数。",
+  "Requires a trustworthy reference path and dual-channel capture.": "要求参考通道可信，并具备双通道采集能力。",
+  "Parameter tasks that must defend consistency across frequency or range instead of only one trusted point.": "适用于不仅要守住单点结果，还要证明跨频率或跨量程一致性的参数题。",
+  "Lock one calibrated anchor point first, then reuse the same capture chain to show that the parameter story stays consistent across a modest sweep.": "先锁定一个已标定锚点，再复用同一采集链路证明参数结论在有限扫频范围内仍保持一致。",
+  "Needs a repeatable sweep source and a capture chain whose gain and phase stay stable across the defended span.": "需要可重复的扫频源，以及在目标频段内增益和相位都稳定的采集链路。",
+  "Anchor-point truth": "锚点结果可信",
+  "Sweep consistency": "扫频一致性",
+  "Range-to-range agreement": "跨量程一致性",
+  "Sweep repeatability": "扫频重复性",
+  "Per-range phase integrity": "各量程相位完整性",
+  "Stable sweep logging": "稳定的扫频记录",
+  "Consistency checks before any heavier fitting": "做复杂拟合前先完成一致性检查",
+  "Known part at anchor point": "锚点处已知样件验证",
+  "Known part across sweep span": "扫频范围内已知样件验证",
+  "Range-boundary replay": "量程边界回放验证",
+  "Do not use this route when even one anchor point is still unstable.": "如果连一个锚点都还不稳定，就不要走这条路线。",
+  "Broader than a single-point inversion route, but only worthwhile after one calibrated point already closes cleanly.": "它比单点反演覆盖更广，但前提是至少已有一个已标定工作点完全跑稳。",
 };
 
 const zhFamilyLabelMap: Array<[string, string]> = [
@@ -397,6 +432,7 @@ function localizeRichZh(text: string): string {
 
   result = result
     .replace(/^Primary object:\s*(.+)\.$/g, "主要测量对象：$1。")
+    .replace(/^Keep the object of measurement explicit instead of drifting into generic signal processing\.$/g, "始终把测量对象讲清楚，不要漂成泛泛的信号处理题。")
     .replace(/^We treat this as a (.+) problem first, not as a generic coding problem\.$/g, "我们先把这题当作$1来处理，而不是泛泛的编程题。")
     .replace(/^Prefer a single stable route for (.+)\.$/g, "优先选择一条针对$1的稳定路线。")
     .replace(/^Treat the problem as (.+) first\.$/g, "先把这道题按$1来理解。")
