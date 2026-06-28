@@ -7,6 +7,19 @@ import { useTranslation } from "@/i18n/LanguageContext";
 
 gsap.registerPlugin(useGSAP);
 
+function formatDisplayId(id: string) {
+  return id
+    .split("-")
+    .map((part) => {
+      if (!part) {
+        return part;
+      }
+
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(" · ");
+}
+
 interface PlanSection {
   title: string;
   items: string[];
@@ -346,10 +359,10 @@ export default function InstrumentationContent() {
   const [loading, setLoading] = useState(false);
   const [imageStatus, setImageStatus] = useState("");
 
-  const examples = useMemo(() => (lang === "zh" ? EXAMPLE_TOPICS.zh : EXAMPLE_TOPICS.en), [lang]);
+  const examples = useMemo(() => EXAMPLE_TOPICS.zh, []);
   const uiText = useMemo(
     () =>
-      lang === "zh"
+      true
         ? {
             recommendationModeOcr: "推荐模式：先识图提字，再走本地蒸馏方案推荐。",
             recommendationModeLocal: "推荐模式：仅使用本地蒸馏方案推荐。",
@@ -516,169 +529,169 @@ export default function InstrumentationContent() {
             executionNotes: "执行注意事项",
           }
         : {
-            recommendationModeOcr: "Recommendation mode: OCR for text extraction + local distilled planner.",
-            recommendationModeLocal: "Recommendation mode: local distilled planner only.",
-            ocrBudget: "OCR budget",
-            used: "used",
-            remaining: "remaining",
-            requestOcrUsage: "This request OCR usage",
-            matchLogic: "Match Logic",
-            whyThisPlan: "Why This Plan",
-            distilledFamily: "Distilled Family",
-            diagnosisCues: "Diagnosis Cues",
-            principleChoices: "Principle Choices",
-            mustHaveDeliverables: "Must Have Deliverables",
-            defenseFocus: "Defense Focus",
-            failureModes: "Failure Modes",
-            stretchGoals: "Stretch Goals",
-            sharedPlaybook: "Shared Playbook",
-            crossProblemKnowledge: "Cross-problem family knowledge",
-            sharedHardwareStack: "Shared Hardware Stack",
-            sharedErrorSources: "Shared Error Sources",
-            sharedDefenseQuestions: "Shared Defense Questions",
-            provincialToNationalUpgrades: "Provincial To National Upgrades",
-            objectiveMap: "Objective Map",
-            whatThisFamilyMeasures: "What this family is really measuring",
-            measurementObjects: "Measurement Objects",
-            requiredOutputs: "Required Outputs",
-            observabilityAnchors: "Observability Anchors",
-            successFloor: "Success Floor",
-            recommendedModules: "Recommended Modules",
-            reusableMeasurementModules: "Reusable measurement modules to build first",
-            scorePrefix: "score",
-            whenToUse: "When To Use",
-            requiredSignals: "Required Signals",
-            failureAlerts: "Failure Alerts",
-            quickestBench: "Quickest Bench",
-            prerequisites: "Prerequisites",
-            unlocks: "Unlocks",
-            avoidParallelWith: "Avoid Parallel With",
-            minimumAssemblyOrder: "Minimum Assembly Order",
-            provincialFloor: "Provincial Floor",
-            stretchSignals: "Stretch Signals",
-            fallbackTriggers: "Fallback Triggers",
-            coreBom: "Core BOM",
-            optionalUpgrades: "Optional Upgrades",
-            benchSetup: "Bench Setup",
-            calibrationWorkflow: "Calibration Workflow",
-            preContestQuickPack: "Pre-Contest Quick Pack",
-            recurringSymptoms: "Recurring Symptoms",
-            firstChecks: "First Checks",
-            commonRootCauses: "Common Root Causes",
-            fastRecoveryMoves: "Fast Recovery Moves",
-            twoMinuteDefense: "Two-Minute Defense",
-            errorClosureStory: "Error-Closure Story",
-            demoNarrative: "Demo Narrative",
-            submissionFloor: "Submission Floor",
-            provincialReady: "Provincial Ready",
-            foundationPhase: "Foundation Phase",
-            measurementPhase: "Measurement Phase",
-            specializationPhase: "Specialization Phase",
-            mockContestPhase: "Mock Contest Phase",
-            anchorProblems: "Anchor Problems",
-            transferPatterns: "Transfer Patterns",
-            escalationEdges: "Escalation Edges",
-            antiPatterns: "Anti-Patterns",
-            entryChecks: "Entry Checks",
-            preferredRoutes: "Preferred Routes",
-            routeKillers: "Route Killers",
-            fallbackRules: "Fallback Rules",
-            strongPositiveCues: "Strong Positive Cues",
-            weakPositiveCues: "Weak Positive Cues",
-            disambiguators: "Disambiguators",
-            routeRejectionCues: "Route Rejection Cues",
-            commonConfusions: "Common Confusions",
-            recoveryChecks: "Recovery Checks",
-            safeFallbackClaims: "Safe Fallback Claims",
-            escalationWarnings: "Escalation Warnings",
-            triggerToPivot: "Trigger To Pivot",
-            fastestPivotCheck: "Fastest Pivot Check",
-            reusableAssets: "Reusable Assets",
-            stopReusingFirst: "Stop Reusing First",
-            goalPhrases: "Goal Phrases",
-            metricPhrases: "Metric Phrases",
-            constraintPhrases: "Constraint Phrases",
-            deliverablePhrases: "Deliverable Phrases",
-            goalTerms: "Goal Terms",
-            metricTerms: "Metric Terms",
-            constraintTerms: "Constraint Terms",
-            deliverableTerms: "Deliverable Terms",
-            whyItLooksClose: "Why It Looks Close",
-            whyItRedirects: "Why It Redirects",
-            fastestQuestion: "Fastest Question",
-            reuseWhat: "Reuse What",
-            dropWhat: "Drop What",
-            familyBoundary: "Family Boundary",
-            familySplitLogic: "Distilled family-vs-family split logic",
-            signalPrefix: "Signal",
-            primaryPrefix: "Primary",
-            competingPrefix: "Competing",
-            primaryWinsWhen: "Primary Wins When",
-            competingWinsWhen: "Competing Wins When",
-            wrongTurnCost: "Wrong-Turn Cost",
-            routeVariants: "Route Variants",
-            distilledImplementationRoutes: "Distilled implementation routes",
-            hardwareGate: "Hardware Gate",
-            measurementTargets: "Measurement Targets",
-            hardwareFocus: "Hardware Focus",
-            softwareFocus: "Software Focus",
-            tradeoffs: "Tradeoffs",
-            validationChecklist: "Validation Checklist",
-            avoidWhen: "Avoid When",
-            provincialProof: "Provincial Proof",
-            collapseSignals: "Collapse Signals",
-            implementationTiers: "Implementation Tiers",
-            distilledBuildRoutes: "Distilled build routes",
-            hardware: "Hardware",
-            software: "Software",
-            historicalMatches: "Historical Matches",
-            distilledReferenceProblems: "Distilled reference problems",
-            coreChain: "Core Chain",
-            deliverables: "Deliverables",
-            pitfalls: "Pitfalls",
-            scoringFocus: "Scoring Focus",
-            solutionBlueprint: "Solution Blueprint",
-            principleRoute: "Principle Route",
-            frontEndFocus: "Front-End Focus",
-            algorithmBackbone: "Algorithm Backbone",
-            calibrationBench: "Calibration Bench",
-            demoSequence: "Demo Sequence",
-            disambiguationMap: "Disambiguation Map",
-            easyToConfuseWith: "Easy To Confuse With",
-            separatingSignals: "Separating Signals",
-            preferredStoryline: "Preferred Storyline",
-            overclaimBoundaries: "Overclaim Boundaries",
-            transferMap: "Transfer Map",
-            bestBorrowedFrom: "Best Borrowed From",
-            reusableModules: "Reusable Modules",
-            nonReusableHabits: "Non-Reusable Habits",
-            fastestCarryOverChecks: "Fastest Carry-Over Checks",
-            tieredBuildPlan: "Tiered Build Plan",
-            hardwareStack: "Hardware Stack",
-            softwareScope: "Software Scope",
-            metricPriority: "Metric Priority",
-            avoidOverbuild: "Avoid Overbuild",
-            validationPack: "Validation Pack",
-            calibrationFixtures: "Calibration Fixtures",
-            acceptanceChecklist: "Acceptance Checklist",
-            edgeCases: "Edge Cases",
-            defenseCheckpoints: "Defense Checkpoints",
-            troubleshootingPack: "Troubleshooting Pack",
-            failureSymptoms: "Failure Symptoms",
-            likelyRootCauses: "Likely Root Causes",
-            fastRecoveryActions: "Fast Recovery Actions",
-            defensePack: "Defense Pack",
-            judgeQuestions: "Judge Questions",
-            recommendedAnswers: "Recommended Answers",
-            demoScoringMoves: "Demo Scoring Moves",
-            phrasesToAvoid: "Phrases To Avoid",
-            benchmarkPack: "Benchmark Pack",
-            recommendedReferences: "Recommended References",
-            minimumAcceptanceNumbers: "Minimum Acceptance Numbers",
-            competitionDayQuickChecks: "Competition Day Quick Checks",
-            overnightBurnInChecks: "Overnight Burn-In Checks",
-            winningPattern: "Winning Pattern",
-            executionNotes: "Execution Notes",
+            recommendationModeOcr: "推荐模式：先识图提字，再走本地蒸馏方案推荐。",
+            recommendationModeLocal: "推荐模式：仅使用本地蒸馏方案推荐。",
+            ocrBudget: "OCR 预算",
+            used: "已用",
+            remaining: "剩余",
+            requestOcrUsage: "本次 OCR 消耗",
+            matchLogic: "匹配依据",
+            whyThisPlan: "为什么推荐这套方案",
+            distilledFamily: "蒸馏题族",
+            diagnosisCues: "识别信号",
+            principleChoices: "原理路线",
+            mustHaveDeliverables: "必须交付",
+            defenseFocus: "答辩重点",
+            failureModes: "常见翻车点",
+            stretchGoals: "进阶加分项",
+            sharedPlaybook: "共用打法",
+            crossProblemKnowledge: "跨题通用知识",
+            sharedHardwareStack: "共用硬件栈",
+            sharedErrorSources: "共用误差源",
+            sharedDefenseQuestions: "共用答辩问题",
+            provincialToNationalUpgrades: "从省奖到国奖的升级点",
+            objectiveMap: "目标地图",
+            whatThisFamilyMeasures: "这类题本质在测什么",
+            measurementObjects: "测量对象",
+            requiredOutputs: "必出结果",
+            observabilityAnchors: "关键观测锚点",
+            successFloor: "保底达标线",
+            recommendedModules: "推荐模块",
+            reusableMeasurementModules: "优先搭好的可复用测量模块",
+            scorePrefix: "得分",
+            whenToUse: "适用场景",
+            requiredSignals: "依赖信号",
+            failureAlerts: "失败预警",
+            quickestBench: "最快台架验证",
+            prerequisites: "前置条件",
+            unlocks: "解锁能力",
+            avoidParallelWith: "不要并行做",
+            minimumAssemblyOrder: "最小搭建顺序",
+            provincialFloor: "省奖保底线",
+            stretchSignals: "冲高信号",
+            fallbackTriggers: "回退触发条件",
+            coreBom: "核心器件清单",
+            optionalUpgrades: "可选升级项",
+            benchSetup: "台架配置",
+            calibrationWorkflow: "标定流程",
+            preContestQuickPack: "赛前速查包",
+            recurringSymptoms: "高频症状",
+            firstChecks: "第一检查项",
+            commonRootCauses: "常见根因",
+            fastRecoveryMoves: "快速恢复动作",
+            twoMinuteDefense: "两分钟答辩",
+            errorClosureStory: "误差闭环说法",
+            demoNarrative: "演示叙事",
+            submissionFloor: "提交保底线",
+            provincialReady: "省奖就绪信号",
+            foundationPhase: "基础阶段",
+            measurementPhase: "测量阶段",
+            specializationPhase: "专项阶段",
+            mockContestPhase: "模拟赛阶段",
+            anchorProblems: "锚点题目",
+            transferPatterns: "迁移模式",
+            escalationEdges: "升级边界",
+            antiPatterns: "反模式",
+            entryChecks: "入口检查",
+            preferredRoutes: "优选路线",
+            routeKillers: "路线杀手项",
+            fallbackRules: "回退规则",
+            strongPositiveCues: "强正向信号",
+            weakPositiveCues: "弱正向信号",
+            disambiguators: "区分点",
+            routeRejectionCues: "路线否决信号",
+            commonConfusions: "常见混淆",
+            recoveryChecks: "恢复检查",
+            safeFallbackClaims: "安全保底表述",
+            escalationWarnings: "升级警告",
+            triggerToPivot: "切换触发条件",
+            fastestPivotCheck: "最快切换检查",
+            reusableAssets: "可复用资产",
+            stopReusingFirst: "优先停用项",
+            goalPhrases: "目标表述",
+            metricPhrases: "指标表述",
+            constraintPhrases: "约束表述",
+            deliverablePhrases: "交付表述",
+            goalTerms: "目标词",
+            metricTerms: "指标词",
+            constraintTerms: "约束词",
+            deliverableTerms: "交付词",
+            whyItLooksClose: "为什么看起来像",
+            whyItRedirects: "为什么要改判",
+            fastestQuestion: "最快区分问题",
+            reuseWhat: "能复用什么",
+            dropWhat: "要放弃什么",
+            familyBoundary: "题族边界",
+            familySplitLogic: "蒸馏出的题族分流逻辑",
+            signalPrefix: "信号强度",
+            primaryPrefix: "主路线",
+            competingPrefix: "竞争路线",
+            primaryWinsWhen: "主路线成立条件",
+            competingWinsWhen: "竞争路线成立条件",
+            wrongTurnCost: "走错路线代价",
+            routeVariants: "路线变体",
+            distilledImplementationRoutes: "蒸馏后的实现路线",
+            hardwareGate: "硬件门槛",
+            measurementTargets: "测量目标",
+            hardwareFocus: "硬件重点",
+            softwareFocus: "软件重点",
+            tradeoffs: "取舍点",
+            validationChecklist: "验证清单",
+            avoidWhen: "不适用条件",
+            provincialProof: "省奖证明点",
+            collapseSignals: "失效信号",
+            implementationTiers: "实现层级",
+            distilledBuildRoutes: "蒸馏后的搭建路线",
+            hardware: "硬件",
+            software: "软件",
+            historicalMatches: "历年匹配题",
+            distilledReferenceProblems: "蒸馏参考题",
+            coreChain: "核心链路",
+            deliverables: "交付物",
+            pitfalls: "易错点",
+            scoringFocus: "得分重点",
+            solutionBlueprint: "方案蓝图",
+            principleRoute: "原理路线",
+            frontEndFocus: "前端重点",
+            algorithmBackbone: "算法骨架",
+            calibrationBench: "标定台架",
+            demoSequence: "演示顺序",
+            disambiguationMap: "区分地图",
+            easyToConfuseWith: "容易混淆对象",
+            separatingSignals: "区分信号",
+            preferredStoryline: "推荐讲述线",
+            overclaimBoundaries: "避免过度宣称边界",
+            transferMap: "迁移地图",
+            bestBorrowedFrom: "最适合借鉴自",
+            reusableModules: "可复用模块",
+            nonReusableHabits: "不可复用习惯",
+            fastestCarryOverChecks: "最快迁移检查",
+            tieredBuildPlan: "分层搭建方案",
+            hardwareStack: "硬件栈",
+            softwareScope: "软件范围",
+            metricPriority: "指标优先级",
+            avoidOverbuild: "避免过度设计",
+            validationPack: "验证包",
+            calibrationFixtures: "标定夹具",
+            acceptanceChecklist: "验收清单",
+            edgeCases: "边界情况",
+            defenseCheckpoints: "答辩检查点",
+            troubleshootingPack: "排障包",
+            failureSymptoms: "故障症状",
+            likelyRootCauses: "可能根因",
+            fastRecoveryActions: "快速恢复动作",
+            defensePack: "答辩包",
+            judgeQuestions: "评委常问",
+            recommendedAnswers: "推荐回答",
+            demoScoringMoves: "演示得分动作",
+            phrasesToAvoid: "避免措辞",
+            benchmarkPack: "基准验证包",
+            recommendedReferences: "推荐参考物",
+            minimumAcceptanceNumbers: "最低验收数字",
+            competitionDayQuickChecks: "比赛日快检",
+            overnightBurnInChecks: "过夜老化检查",
+            winningPattern: "获奖方案共性",
+            executionNotes: "执行注意事项",
           },
     [lang],
   );
@@ -1011,12 +1024,12 @@ export default function InstrumentationContent() {
                       </p>
                       <p>
                         {uiText.ocrBudget}: {planMeta.ocrBudget.totalUsed.toLocaleString()} /{" "}
-                        {planMeta.ocrBudget.totalBudget.toLocaleString()} tokens {uiText.used}，
+                        {planMeta.ocrBudget.totalBudget.toLocaleString()} 令牌 {uiText.used}，
                         {planMeta.ocrBudget.remaining.toLocaleString()} {uiText.remaining}。
                       </p>
                       {planMeta.ocrUsage?.totalTokens ? (
                         <p>
-                          {uiText.requestOcrUsage}: {planMeta.ocrUsage.totalTokens.toLocaleString()} tokens。
+                          {uiText.requestOcrUsage}: {planMeta.ocrUsage.totalTokens.toLocaleString()} 令牌。
                         </p>
                       ) : null}
                     </div>
@@ -1242,7 +1255,7 @@ export default function InstrumentationContent() {
                           <div className="flex flex-wrap items-center gap-3">
                             <h5 className="text-lg font-semibold text-white">{module.name}</h5>
                             <span className="rounded-full bg-cyan-500/14 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100">
-                              {module.id}
+                              {formatDisplayId(module.id)}
                             </span>
                             {typeof module.score === "number" && module.score > 0 ? (
                               <span className="rounded-full bg-amber-500/14 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-100">
@@ -2129,7 +2142,7 @@ export default function InstrumentationContent() {
                           <div className="flex flex-wrap items-center gap-3">
                             <h5 className="text-lg font-semibold text-white">{item.title}</h5>
                             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-slate-200">
-                              vs {item.competingFamily}
+                              对比 {item.competingFamily}
                             </span>
                             {typeof item.signalStrength === "number" && item.signalStrength > 0 ? (
                               <span className="rounded-full bg-cyan-300/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100">
@@ -2215,7 +2228,7 @@ export default function InstrumentationContent() {
                           <div className="flex flex-wrap items-center gap-3">
                             <h5 className="text-lg font-semibold text-white">{route.name}</h5>
                             <span className="rounded-full bg-cyan-500/14 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100">
-                              {route.id}
+                              {formatDisplayId(route.id)}
                             </span>
                             {typeof route.score === "number" && route.score > 0 ? (
                               <span className="rounded-full bg-amber-500/14 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-100">
@@ -2242,14 +2255,14 @@ export default function InstrumentationContent() {
 
                           {route.hardwareGate ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Hardware Gate</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.hardwareGate}</p>
                               <p className="mt-3 text-sm leading-7 text-slate-200">{route.hardwareGate}</p>
                             </div>
                           ) : null}
 
                           {route.measurementTargets?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Measurement Targets</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.measurementTargets}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {route.measurementTargets.map((item) => (
                                   <li key={item}>- {item}</li>
@@ -2260,7 +2273,7 @@ export default function InstrumentationContent() {
 
                           <div className="mt-4 grid gap-4 md:grid-cols-3">
                             <div className="rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Hardware Focus</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.hardwareFocus}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {route.hardwareFocus.map((item) => (
                                   <li key={item}>- {item}</li>
@@ -2269,7 +2282,7 @@ export default function InstrumentationContent() {
                             </div>
 
                             <div className="rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Software Focus</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.softwareFocus}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {route.softwareFocus.map((item) => (
                                   <li key={item}>- {item}</li>
@@ -2278,7 +2291,7 @@ export default function InstrumentationContent() {
                             </div>
 
                             <div className="rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Tradeoffs</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.tradeoffs}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {route.tradeoffs.map((item) => (
                                   <li key={item}>- {item}</li>
@@ -2290,7 +2303,7 @@ export default function InstrumentationContent() {
                           <div className="mt-4 grid gap-4 md:grid-cols-2">
                             {route.validationChecklist?.length ? (
                               <div className="rounded-2xl bg-slate-950/28 p-4">
-                                <p className="text-sm font-semibold text-amber-200">Validation Checklist</p>
+                                <p className="text-sm font-semibold text-amber-200">{uiText.validationChecklist}</p>
                                 <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                   {route.validationChecklist.map((item) => (
                                     <li key={item}>- {item}</li>
@@ -2301,7 +2314,7 @@ export default function InstrumentationContent() {
 
                             {route.avoidWhen?.length ? (
                               <div className="rounded-2xl bg-slate-950/28 p-4">
-                                <p className="text-sm font-semibold text-amber-200">Avoid When</p>
+                                <p className="text-sm font-semibold text-amber-200">{uiText.avoidWhen}</p>
                                 <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                   {route.avoidWhen.map((item) => (
                                     <li key={item}>- {item}</li>
@@ -2314,7 +2327,7 @@ export default function InstrumentationContent() {
                           <div className="mt-4 grid gap-4 md:grid-cols-3">
                             {route.provincialProof?.length ? (
                               <div className="rounded-2xl bg-slate-950/28 p-4">
-                                <p className="text-sm font-semibold text-amber-200">Provincial Proof</p>
+                                <p className="text-sm font-semibold text-amber-200">{uiText.provincialProof}</p>
                                 <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                   {route.provincialProof.map((item) => (
                                     <li key={item}>- {item}</li>
@@ -2325,7 +2338,7 @@ export default function InstrumentationContent() {
 
                             {route.stretchSignals?.length ? (
                               <div className="rounded-2xl bg-slate-950/28 p-4">
-                                <p className="text-sm font-semibold text-amber-200">Stretch Signals</p>
+                                <p className="text-sm font-semibold text-amber-200">{uiText.stretchSignals}</p>
                                 <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                   {route.stretchSignals.map((item) => (
                                     <li key={item}>- {item}</li>
@@ -2336,7 +2349,7 @@ export default function InstrumentationContent() {
 
                             {route.collapseSignals?.length ? (
                               <div className="rounded-2xl bg-slate-950/28 p-4">
-                                <p className="text-sm font-semibold text-amber-200">Collapse Signals</p>
+                                <p className="text-sm font-semibold text-amber-200">{uiText.collapseSignals}</p>
                                 <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                   {route.collapseSignals.map((item) => (
                                     <li key={item}>- {item}</li>
@@ -2379,10 +2392,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-200/80">
-                        Implementation Tiers
+                        {uiText.implementationTiers}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        Distilled build routes
+                        {uiText.distilledBuildRoutes}
                       </h4>
                     </div>
 
@@ -2401,7 +2414,7 @@ export default function InstrumentationContent() {
                           </p>
                           <div className="mt-4 grid gap-4 md:grid-cols-2">
                             <div className="rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Hardware</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.hardware}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {tier.hardware.map((item) => (
                                   <li key={item}>- {item}</li>
@@ -2409,7 +2422,7 @@ export default function InstrumentationContent() {
                               </ul>
                             </div>
                             <div className="rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Software</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.software}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {tier.software.map((item) => (
                                   <li key={item}>- {item}</li>
@@ -2479,7 +2492,7 @@ export default function InstrumentationContent() {
                           <div className="mt-4 grid gap-4 md:grid-cols-3">
                             {problem.mustHaveDeliverables?.length ? (
                               <div className="rounded-2xl bg-slate-950/28 p-4">
-                                <p className="text-sm font-semibold text-amber-200">Deliverables</p>
+                                <p className="text-sm font-semibold text-amber-200">{uiText.deliverables}</p>
                                 <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                   {problem.mustHaveDeliverables.map((item) => (
                                     <li key={item}>- {item}</li>
@@ -2490,7 +2503,7 @@ export default function InstrumentationContent() {
 
                             {problem.commonPitfalls?.length ? (
                               <div className="rounded-2xl bg-slate-950/28 p-4">
-                                <p className="text-sm font-semibold text-amber-200">Pitfalls</p>
+                                <p className="text-sm font-semibold text-amber-200">{uiText.pitfalls}</p>
                                 <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                   {problem.commonPitfalls.map((item) => (
                                     <li key={item}>- {item}</li>
@@ -2501,7 +2514,7 @@ export default function InstrumentationContent() {
 
                             {problem.scoringFocus?.length ? (
                               <div className="rounded-2xl bg-slate-950/28 p-4">
-                                <p className="text-sm font-semibold text-amber-200">Scoring Focus</p>
+                                <p className="text-sm font-semibold text-amber-200">{uiText.scoringFocus}</p>
                                 <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                   {problem.scoringFocus.map((item) => (
                                     <li key={item}>- {item}</li>
@@ -2517,12 +2530,12 @@ export default function InstrumentationContent() {
                           problem.calibrationBench?.length ||
                           problem.demoSequence?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Solution Blueprint</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.solutionBlueprint}</p>
                               <div className="mt-4 grid gap-4 md:grid-cols-2">
                                 {problem.principleRoute?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Principle Route
+                                      {uiText.principleRoute}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.principleRoute.map((item) => (
@@ -2535,7 +2548,7 @@ export default function InstrumentationContent() {
                                 {problem.frontEndFocus?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Front-End Focus
+                                      {uiText.frontEndFocus}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.frontEndFocus.map((item) => (
@@ -2548,7 +2561,7 @@ export default function InstrumentationContent() {
                                 {problem.algorithmBackbone?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Algorithm Backbone
+                                      {uiText.algorithmBackbone}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.algorithmBackbone.map((item) => (
@@ -2561,7 +2574,7 @@ export default function InstrumentationContent() {
                                 {problem.calibrationBench?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Calibration Bench
+                                      {uiText.calibrationBench}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.calibrationBench.map((item) => (
@@ -2574,7 +2587,7 @@ export default function InstrumentationContent() {
                                 {problem.demoSequence?.length ? (
                                   <div className="md:col-span-2">
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Demo Sequence
+                                      {uiText.demoSequence}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.demoSequence.map((item) => (
@@ -2654,12 +2667,12 @@ export default function InstrumentationContent() {
                           problem.nonReusableHabits?.length ||
                           problem.fastestCarryOverChecks?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Transfer Map</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.transferMap}</p>
                               <div className="mt-4 grid gap-4 md:grid-cols-2">
                                 {problem.bestBorrowedFrom?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Best Borrowed From
+                                      {uiText.bestBorrowedFrom}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.bestBorrowedFrom.map((item) => (
@@ -2672,7 +2685,7 @@ export default function InstrumentationContent() {
                                 {problem.reusableModules?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Reusable Modules
+                                      {uiText.reusableModules}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.reusableModules.map((item) => (
@@ -2685,7 +2698,7 @@ export default function InstrumentationContent() {
                                 {problem.nonReusableHabits?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Non-Reusable Habits
+                                      {uiText.nonReusableHabits}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.nonReusableHabits.map((item) => (
@@ -2698,7 +2711,7 @@ export default function InstrumentationContent() {
                                 {problem.fastestCarryOverChecks?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Fastest Carry-Over Checks
+                                      {uiText.fastestCarryOverChecks}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.fastestCarryOverChecks.map((item) => (
@@ -2712,7 +2725,7 @@ export default function InstrumentationContent() {
                           ) : null}
                           {problem.buildTiers?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Tiered Build Plan</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.tieredBuildPlan}</p>
                               <div className="mt-4 grid gap-4 xl:grid-cols-3">
                                 {problem.buildTiers.map((tier) => (
                                   <article key={`${problem.id}-${tier.tier}`} className="rounded-2xl bg-white/6 p-4">
@@ -2725,7 +2738,7 @@ export default function InstrumentationContent() {
                                     <div className="mt-4 space-y-4">
                                       <div>
                                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                          Hardware Stack
+                                          {uiText.hardwareStack}
                                         </p>
                                         <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                           {tier.hardwareStack.map((item) => (
@@ -2736,7 +2749,7 @@ export default function InstrumentationContent() {
 
                                       <div>
                                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                          Software Scope
+                                          {uiText.softwareScope}
                                         </p>
                                         <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                           {tier.softwareScope.map((item) => (
@@ -2747,7 +2760,7 @@ export default function InstrumentationContent() {
 
                                       <div>
                                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                          Metric Priority
+                                          {uiText.metricPriority}
                                         </p>
                                         <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                           {tier.metricPriority.map((item) => (
@@ -2758,7 +2771,7 @@ export default function InstrumentationContent() {
 
                                       <div>
                                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                          Avoid Overbuild
+                                          {uiText.avoidOverbuild}
                                         </p>
                                         <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                           {tier.avoidOverbuild.map((item) => (
@@ -2777,12 +2790,12 @@ export default function InstrumentationContent() {
                           problem.edgeCases?.length ||
                           problem.defenseCheckpoints?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Validation Pack</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.validationPack}</p>
                               <div className="mt-4 grid gap-4 md:grid-cols-2">
                                 {problem.calibrationFixtures?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Calibration Fixtures
+                                      {uiText.calibrationFixtures}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.calibrationFixtures.map((item) => (
@@ -2795,7 +2808,7 @@ export default function InstrumentationContent() {
                                 {problem.acceptanceChecklist?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Acceptance Checklist
+                                      {uiText.acceptanceChecklist}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.acceptanceChecklist.map((item) => (
@@ -2808,7 +2821,7 @@ export default function InstrumentationContent() {
                                 {problem.edgeCases?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Edge Cases
+                                      {uiText.edgeCases}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.edgeCases.map((item) => (
@@ -2821,7 +2834,7 @@ export default function InstrumentationContent() {
                                 {problem.defenseCheckpoints?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Defense Checkpoints
+                                      {uiText.defenseCheckpoints}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.defenseCheckpoints.map((item) => (
@@ -2838,12 +2851,12 @@ export default function InstrumentationContent() {
                           problem.likelyRootCauses?.length ||
                           problem.fastRecoveryActions?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Troubleshooting Pack</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.troubleshootingPack}</p>
                               <div className="mt-4 grid gap-4 md:grid-cols-2">
                                 {problem.failureSymptoms?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Failure Symptoms
+                                      {uiText.failureSymptoms}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.failureSymptoms.map((item) => (
@@ -2856,7 +2869,7 @@ export default function InstrumentationContent() {
                                 {problem.firstChecks?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      First Checks
+                                      {uiText.firstChecks}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.firstChecks.map((item) => (
@@ -2869,7 +2882,7 @@ export default function InstrumentationContent() {
                                 {problem.likelyRootCauses?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Likely Root Causes
+                                      {uiText.likelyRootCauses}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.likelyRootCauses.map((item) => (
@@ -2882,7 +2895,7 @@ export default function InstrumentationContent() {
                                 {problem.fastRecoveryActions?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Fast Recovery Actions
+                                      {uiText.fastRecoveryActions}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.fastRecoveryActions.map((item) => (
@@ -2899,12 +2912,12 @@ export default function InstrumentationContent() {
                           problem.demoScoringMoves?.length ||
                           problem.phrasesToAvoid?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Defense Pack</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.defensePack}</p>
                               <div className="mt-4 grid gap-4 md:grid-cols-2">
                                 {problem.judgeQuestions?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Judge Questions
+                                      {uiText.judgeQuestions}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.judgeQuestions.map((item) => (
@@ -2917,7 +2930,7 @@ export default function InstrumentationContent() {
                                 {problem.recommendedAnswers?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Recommended Answers
+                                      {uiText.recommendedAnswers}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.recommendedAnswers.map((item) => (
@@ -2930,7 +2943,7 @@ export default function InstrumentationContent() {
                                 {problem.demoScoringMoves?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Demo Scoring Moves
+                                      {uiText.demoScoringMoves}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.demoScoringMoves.map((item) => (
@@ -2943,7 +2956,7 @@ export default function InstrumentationContent() {
                                 {problem.phrasesToAvoid?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Phrases To Avoid
+                                      {uiText.phrasesToAvoid}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.phrasesToAvoid.map((item) => (
@@ -2960,12 +2973,12 @@ export default function InstrumentationContent() {
                           problem.competitionDayQuickChecks?.length ||
                           problem.overnightBurnInChecks?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Benchmark Pack</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.benchmarkPack}</p>
                               <div className="mt-4 grid gap-4 md:grid-cols-2">
                                 {problem.recommendedReferences?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Recommended References
+                                      {uiText.recommendedReferences}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.recommendedReferences.map((item) => (
@@ -2978,7 +2991,7 @@ export default function InstrumentationContent() {
                                 {problem.minimumAcceptanceNumbers?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Minimum Acceptance
+                                      {uiText.minimumAcceptanceNumbers}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.minimumAcceptanceNumbers.map((item) => (
@@ -2991,7 +3004,7 @@ export default function InstrumentationContent() {
                                 {problem.competitionDayQuickChecks?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Competition-Day Quick Checks
+                                      {uiText.competitionDayQuickChecks}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.competitionDayQuickChecks.map((item) => (
@@ -3004,7 +3017,7 @@ export default function InstrumentationContent() {
                                 {problem.overnightBurnInChecks?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Overnight Burn-In Checks
+                                      {uiText.overnightBurnInChecks}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.overnightBurnInChecks.map((item) => (
@@ -3021,12 +3034,12 @@ export default function InstrumentationContent() {
                           problem.calibrationFocus?.length ||
                           problem.defenseAngles?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Winning Pattern</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.winningPattern}</p>
                               <div className="mt-4 grid gap-4 md:grid-cols-2">
                                 {problem.recommendedHardware?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Hardware
+                                      {uiText.hardware}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.recommendedHardware.map((item) => (
@@ -3039,7 +3052,7 @@ export default function InstrumentationContent() {
                                 {problem.softwareBackbone?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Software Backbone
+                                      {uiText.algorithmBackbone}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.softwareBackbone.map((item) => (
@@ -3052,7 +3065,7 @@ export default function InstrumentationContent() {
                                 {problem.calibrationFocus?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Calibration
+                                      {uiText.calibrationBench}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.calibrationFocus.map((item) => (
@@ -3065,7 +3078,7 @@ export default function InstrumentationContent() {
                                 {problem.defenseAngles?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Defense Angles
+                                      {uiText.defenseFocus}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.defenseAngles.map((item) => (
@@ -3082,12 +3095,12 @@ export default function InstrumentationContent() {
                           problem.abnormalChecklist?.length ||
                           problem.defenseScript?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Execution Notes</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.executionNotes}</p>
                               <div className="mt-4 grid gap-4 md:grid-cols-3">
                                 {problem.stabilizeFirst?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Stabilize First
+                                      稳住优先项
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.stabilizeFirst.map((item) => (
@@ -3100,7 +3113,7 @@ export default function InstrumentationContent() {
                                 {problem.abnormalChecklist?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Abnormal Checklist
+                                      异常检查清单
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.abnormalChecklist.map((item) => (
@@ -3113,7 +3126,7 @@ export default function InstrumentationContent() {
                                 {problem.defenseScript?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Defense Script
+                                      答辩话术
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.defenseScript.map((item) => (

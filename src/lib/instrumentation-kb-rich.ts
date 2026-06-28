@@ -343,9 +343,133 @@ const zhTextOverrides: Record<string, string> = {
   "Which calibration step most reduces the final error?": "哪一步标定对最终误差下降最关键？",
   "Add more edge cases only after the baseline route is stable.": "先把基线路线做稳，再去补更多边界情况。",
   "National-level polish usually comes from error closure and robustness, not from a brand-new architecture.": "国奖级提升通常来自误差闭环和鲁棒性，而不是推倒重来换架构。",
+  "Cross-channel skew can dominate the final result.": "双通道偏斜可能直接主导最终误差。",
+  "Feed the same signal into both channels and measure residual mismatch.": "把同一信号同时送入两路，直接测残差失配。",
+  "Stable source or reference path": "稳定的信号源或参考通道",
+  "Phase extraction": "相位提取",
+  "Reference-informed suppression metrics": "基于参考通道的抑制指标",
+  "Auto-ranging before channel skew is measured": "在双通道偏斜未测清前不要先做自动量程",
+  "Immediately after source bring-up": "信号源打通后立刻搭建",
+  "Repeatable phase and amplitude comparisons": "相位与幅值对比结果可重复",
+  "Per-range calibration remains stable over time": "各量程标定结果随时间保持稳定",
+  "If skew is unstable, freeze to one trusted range and one trusted frequency": "若通道偏斜不稳定，就先冻结到一个可信量程和一个可信频点",
+  "Stable inversion": "稳定反演",
+  "Reference comparisons": "参考对比能力",
+  "Timing-valid capture": "时序有效采集",
+  "Dense algorithm tuning before the source is stable": "信号源未稳定前不要先做密集算法调参",
+  "Bring up first": "优先最先打通",
+  "Multiple ranges remain consistent after calibration.": "完成标定后，多量程结果仍保持一致。",
+  "The same capture chain preserves parameter consistency across moderate sweep expansion or range switching.": "在适度扩展扫频范围或切换量程后，同一采集链路仍能保持参数一致性。",
+  "A drifting reference breaks downstream interpretation.": "参考通道一旦漂移，后续解释都会失真。",
+  "Probe the source and compare it against the timing reference.": "先直接测信号源，并和时序参考进行对比。",
 };
 
-const t = (en: string, zh = zhTextOverrides[en] ?? en): RichLocalizedText => ({ en, zh });
+const zhFamilyLabelMap: Array<[string, string]> = [
+  ["Electrical parameter testing", "电路参数测试"],
+  ["Distortion and spectrum measurement", "失真与频谱测量"],
+  ["Distortion and spectral measurement", "失真与频谱测量"],
+  ["Cable and transmission-line detection", "线缆与传输线检测"],
+  ["Cable and transmission-line diagnostics", "线缆与传输线检测"],
+  ["Adaptive filtering and noise suppression", "自适应滤波与噪声抑制"],
+  ["Adaptive filtering and active compensation", "自适应滤波与主动补偿"],
+  ["Receiver synchronization and lock proof", "接收同步与锁定证明"],
+  ["Signal reception and synchronization", "接收与同步"],
+  ["Localization by timing or geometry", "基于时序或几何的定位"],
+  ["Localization and ranging", "定位与测距"],
+  ["Vision-assisted measurement", "视觉辅助测量"],
+  ["Vision-based measurement", "视觉测量"],
+  ["Networked measurement integrity", "联网测量完整性"],
+  ["Networked measurement and remote truth", "联网测量与远端真值"],
+  ["Modulation recognition and parameter estimation", "调制识别与参数估计"],
+  ["Power-load analysis and feature identification", "负载分析与特征识别"],
+  ["Load analysis and classification", "负载分析与分类"],
+  ["Signal separation and component recovery", "信号分离与分量恢复"],
+  ["Compact model identification and replay validation", "紧凑模型辨识与回放验证"],
+  ["Model identification and replay", "模型辨识与回放验证"],
+];
+
+function localizeRichZh(text: string): string {
+  let result = zhTextOverrides[text] ?? text;
+
+  for (const [en, zh] of zhFamilyLabelMap) {
+    result = result.replaceAll(en, zh);
+  }
+
+  result = result
+    .replace(/^Primary object:\s*(.+)\.$/g, "主要测量对象：$1。")
+    .replace(/^We treat this as a (.+) problem first, not as a generic coding problem\.$/g, "我们先把这题当作$1来处理，而不是泛泛的编程题。")
+    .replace(/^Prefer a single stable route for (.+)\.$/g, "优先选择一条针对$1的稳定路线。")
+    .replace(/^Treat the problem as (.+) first\.$/g, "先把这道题按$1来理解。")
+    .replace(/^Strong cue:\s*(.+)\.$/g, "强触发词：$1。")
+    .replace(/^Weak cue:\s*(.+)\.$/g, "弱触发词：$1。");
+
+  if (/^[A-Za-z0-9][A-Za-z0-9\s\-_/,:;.()]+$/.test(result) && /[A-Za-z]/.test(result)) {
+    result = result
+      .replace(/\bbenchmark\b/gi, "基准样例")
+      .replace(/\breference\b/gi, "参考")
+      .replace(/\bremote\b/gi, "远端")
+      .replace(/\blocal\b/gi, "本地")
+      .replace(/\bsignal\b/gi, "信号")
+      .replace(/\bmeasurement\b/gi, "测量")
+      .replace(/\bmodule\b/gi, "模块")
+      .replace(/\bcapture\b/gi, "采集")
+      .replace(/\bsolver\b/gi, "求解")
+      .replace(/\bfilter\b/gi, "滤波")
+      .replace(/\bgeometry\b/gi, "几何")
+      .replace(/\broute\b/gi, "路线")
+      .replace(/\bstate\b/gi, "状态")
+      .replace(/\btruth\b/gi, "真值")
+      .replace(/\bconsistency\b/gi, "一致性")
+      .replace(/\bphase\b/gi, "相位")
+      .replace(/\bamplitude\b/gi, "幅值")
+      .replace(/\bfrequency\b/gi, "频率")
+      .replace(/\btiming\b/gi, "时序")
+      .replace(/\bcalibration\b/gi, "标定")
+      .replace(/\bvalidation\b/gi, "验证")
+      .replace(/\bclassification\b/gi, "分类")
+      .replace(/\bparameter\b/gi, "参数")
+      .replace(/\bdistortion\b/gi, "失真")
+      .replace(/\bmodel\b/gi, "模型")
+      .replace(/\breplay\b/gi, "回放")
+      .replace(/\banchor\b/gi, "锚点")
+      .replace(/\bhardware\b/gi, "硬件")
+      .replace(/\bsoftware\b/gi, "软件")
+      .replace(/\bknown\b/gi, "已知")
+      .replace(/\bstable\b/gi, "稳定")
+      .replace(/\bproof\b/gi, "证明")
+      .replace(/\banalysis\b/gi, "分析")
+      .replace(/\bfront end\b/gi, "前端")
+      .replace(/\bfront-end\b/gi, "前端")
+      .replace(/\block\b/gi, "锁定")
+      .replace(/\bunlock\b/gi, "失锁")
+      .replace(/\brelock\b/gi, "重锁")
+      .replace(/\bline\b/gi, "线缆")
+      .replace(/\bload\b/gi, "负载")
+      .replace(/\bcarrier\b/gi, "载波")
+      .replace(/\benvelope\b/gi, "包络")
+      .replace(/\bmixed\b/gi, "混合")
+      .replace(/\bcomponent\b/gi, "分量")
+      .replace(/\bcoordinate\b/gi, "坐标")
+      .replace(/\bposition\b/gi, "位置")
+      .replace(/\branging\b/gi, "测距")
+      .replace(/\bvisible\b/gi, "可见")
+      .replace(/\bdisplay\b/gi, "显示")
+      .replace(/\bdrift\b/gi, "漂移")
+      .replace(/\brepeatable\b/gi, "可重复")
+      .replace(/\btrusted\b/gi, "可信")
+      .replace(/\bknown-good\b/gi, "已知正常")
+      .replace(/\bknown-bad\b/gi, "已知极限")
+      .replace(/\bscore\b/gi, "评分")
+      .replace(/\boutput\b/gi, "输出");
+  }
+
+  return result;
+}
+
+const t = (en: string, zh = zhTextOverrides[en] ?? localizeRichZh(en)): RichLocalizedText => {
+  const localized = zhTextOverrides[en] ?? localizeRichZh(en);
+  return { en: localized, zh: zh || localized };
+};
 const tl = (...items: string[]) => items.map((item) => t(item));
 const profileHeadlineZh: Record<string, string> = {
   parameter: "先用已知激励驱动被测对象，稳定提取幅值和相位，再反推出电参数。",
