@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { recommendPlanFromDistilledData } from "@/lib/instrumentation-kb";
+import { recommendPlanFromDistilledData, type RecommendedPlan } from "@/lib/instrumentation-kb";
 
 function normalizeOpenAiBaseUrl(baseUrl: string | undefined) {
   const fallback = "https://api.openai.com/v1";
@@ -80,6 +80,109 @@ interface PlanResponseMeta {
   };
   ocrUsage?: OcrUsage;
   budgetNotice?: string;
+}
+
+function localizePlanStringForZh(text: string): string {
+  return text
+    .replace(/^Distilled Backbone$/g, "蒸馏主线")
+    .replace(/^Route Focus$/g, "路线落点")
+    .replace(/^Secondary family add-on:\s*/g, "次级题型补充：")
+    .replace(/^\?+\s*/g, "次级题型补充：")
+    .replace(/^Primary family match:\s*/g, "主判定题型：")
+    .replace(/^Matched cues:\s*/g, "命中的关键词：")
+    .replace(/^Preferred route:\s*/g, "优先落地路线：")
+    .replace(/^Closest historical matches:\s*/g, "最接近的历年题：")
+    .replace(/^Reference problems:\s*/g, "参考题目：")
+    .replace(/^Distilled backbone:\s*/g, "蒸馏主线：")
+    .replace(/^Secondary family overlap:\s*/g, "次级关联题型：")
+    .replace(/^Preferred implementation route:\s*/g, "优先落地路线：")
+    .replace(/^Hardware gate:\s*/g, "硬件前提：")
+    .replace(/^Problem cues that pushed this route:\s*/g, "推动该路线的题面线索：")
+    .replace(/^Stabilize these target outputs first:\s*/g, "先把这些结果测稳：")
+    .replace(/^Closest distilled historical match:\s*/g, "最近的历年映射题：")
+    .replace(/^Distilled family backbone:\s*/g, "蒸馏主线：")
+    .replace(
+      /^No strong explicit cue was found, so the plan falls back to the common instrumentation chain\.$/g,
+      "题面没有特别强的显式关键词，因此先按通用仪器仪表测量链路兜底。",
+    )
+    .replace(
+      /^The statement appears concentrated in one family, so the recommendation keeps the main chain focused\.$/g,
+      "当前题面更集中于单一题型，建议优先把主链路做深做稳。",
+    )
+    .replace(
+      /^Within this family, the closest implementation route is:\s*(.+)\.$/g,
+      "在该题型里，当前最贴近的落地路线是：$1。",
+    )
+    .replace(
+      /^The recommendation starts from the default route of this family:\s*(.+)\.$/g,
+      "当前先采用该题型的默认落地路线：$1。",
+    )
+    .replace(
+      /^No route card matched strongly, so the recommendation starts from the family backbone\.$/g,
+      "当前没有命中特别明确的路线卡，因此先沿主题型的标准链路推进。",
+    )
+    .replace(
+      /^This family was also reinforced by distilled trigger cues:\s*(.+)\.$/g,
+      "蒸馏触发线索也在强化该判断：$1。",
+    )
+    .replace(
+      /^Statement-pattern matches also reinforced this family:\s*(.+)\.$/g,
+      "题面表述模式也在支持该题型：$1。",
+    )
+    .replace(
+      /^Family lexicon matches also reinforced this family:\s*(.+)\.$/g,
+      "题型词汇也在支持该题型：$1。",
+    )
+    .replace(
+      /^Pairwise family-boundary checks also shaped this match against:\s*(.+)\.$/g,
+      "和以下竞争题型做过边界区分：$1。",
+    )
+    .replace(
+      /^Contrastive wording in the statement also favored this family over:\s*(.+)\.$/g,
+      "题面中的对比式表述也更偏向该题型，而不是：$1。",
+    )
+    .replace(
+      /^The database also checked near-miss routes and kept this family after comparing against:\s*(.+)\.$/g,
+      "数据库还比对了近似误判路线，最终没有切过去：$1。",
+    )
+    .replace(
+      /^Competing-family cues were detected and suppressed through disambiguation:\s*(.+)\.$/g,
+      "也检测到了竞争题型线索，并通过区分条件压下：$1。",
+    )
+    .replace(
+      /^The database also surfaced route-rejection cues that should cap overclaiming:\s*(.+)\.$/g,
+      "数据库还识别到需要控制过度宣称的否决信号：$1。",
+    )
+    .replace(
+      /^The output is driven by the local distilled instrumentation database\.$/g,
+      "推荐结果优先来自本地蒸馏题库，而不是自由生成。",
+    );
+}
+
+function deepLocalizePlanForZh<T>(value: T): T {
+  if (typeof value === "string") {
+    return localizePlanStringForZh(value) as T;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => deepLocalizePlanForZh(item)) as T;
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, deepLocalizePlanForZh(item)]),
+    ) as T;
+  }
+
+  return value;
+}
+
+function finalizePlanLanguage(plan: RecommendedPlan, lang: "en" | "zh"): RecommendedPlan {
+  if (lang !== "zh") {
+    return plan;
+  }
+
+  return deepLocalizePlanForZh(plan);
 }
 
 function shouldRunImageOcr(topic: string | undefined, imageDataUrl: string | undefined, apiKey?: string) {
@@ -400,7 +503,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const plan = recommendPlanFromDistilledData(mergedTopic, lang);
+  const plan = finalizePlanLanguage(recommendPlanFromDistilledData(mergedTopic, lang), lang);
   const meta: PlanResponseMeta = {
     mode: ocrUsed ? "local-kb-plus-ocr" : "local-kb",
     ocrAttempted,
