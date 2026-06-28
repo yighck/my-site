@@ -7,6 +7,7 @@ import { EXAMPLE_TOPICS, INSTRUMENTATION_COPY } from "./content";
 import { compressInstrumentationImage, validateInstrumentationImage } from "./image";
 import ResultView from "./ResultView";
 import type { InstrumentationResponse, InstrumentationPlan, PlanMeta } from "./types";
+import { INSTRUMENTATION_VERSION } from "./version";
 
 gsap.registerPlugin(useGSAP);
 
@@ -179,6 +180,14 @@ export default function InstrumentationContent() {
             <p className="solver-copy mt-6 max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-300">
               {INSTRUMENTATION_COPY.heroCopy}
             </p>
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-slate-50/80 px-3 py-1.5 text-xs text-slate-500 dark:border-white/10 dark:bg-white/6 dark:text-slate-300">
+              <span className="font-semibold text-slate-700 dark:text-white">
+                {INSTRUMENTATION_COPY.deployMarker}
+              </span>
+              <span className="opacity-70">
+                {INSTRUMENTATION_COPY.versionLabel}: {INSTRUMENTATION_VERSION}
+              </span>
+            </div>
           </div>
 
           <aside className="solver-card rounded-[28px] border border-white/60 bg-slate-950 p-6 text-white shadow-[0_24px_80px_rgba(8,15,35,0.22)] dark:border-white/10">

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { recommendPlanFromDistilledData, type RecommendedPlan } from "@/lib/instrumentation-kb";
+import { INSTRUMENTATION_VERSION } from "@/app/instrumentation/version";
 
 function normalizeOpenAiBaseUrl(baseUrl: string | undefined) {
   const fallback = "https://api.openai.com/v1";
@@ -85,6 +86,7 @@ interface PlanResponseMeta {
   mode: "local-kb" | "local-kb-plus-ocr";
   ocrUsed: boolean;
   budgetNotice?: string;
+  version?: string;
 }
 
 function shouldRunImageOcr(topic: string | undefined, imageDataUrl: string | undefined, apiKey?: string) {
@@ -405,9 +407,17 @@ export async function POST(request: NextRequest) {
       mode: ocrUsed ? "local-kb-plus-ocr" : "local-kb",
       ocrUsed,
       budgetNotice: buildBudgetNotice(budgetState, ocrUsage, forcedTextOnly),
+      version: INSTRUMENTATION_VERSION,
     };
 
-    return NextResponse.json({ plan, meta });
+    return NextResponse.json(
+      { plan, meta },
+      {
+        headers: {
+          "x-instrumentation-version": INSTRUMENTATION_VERSION,
+        },
+      },
+    );
   } catch (error) {
     console.error("instrumentation-plan route error", error);
 
@@ -415,7 +425,12 @@ export async function POST(request: NextRequest) {
       {
         error: error instanceof Error ? `服务端处理失败：${error.message}` : "服务端处理失败，请稍后重试。",
       },
-      { status: 500 },
+      {
+        status: 500,
+        headers: {
+          "x-instrumentation-version": INSTRUMENTATION_VERSION,
+        },
+      },
     );
   }
 }

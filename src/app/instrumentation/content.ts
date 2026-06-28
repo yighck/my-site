@@ -45,6 +45,8 @@ export const INSTRUMENTATION_COPY = {
   verifyLabel: "验证清单",
   recommendationModeOcr: "本次方案结合了图片识别结果和本地知识库。",
   recommendationModeLocal: "本次方案直接来自本地知识库。",
+  deployMarker: "中文轻量版",
+  versionLabel: "页面版本",
 } as const;
 
 export const EXAMPLE_TOPICS = [

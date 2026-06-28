@@ -17,6 +17,7 @@ export interface PlanMeta {
   mode: "local-kb" | "local-kb-plus-ocr";
   ocrUsed: boolean;
   budgetNotice?: string;
+  version?: string;
 }
 
 export interface InstrumentationResponse {

@@ -57,11 +57,18 @@ export default function ResultView({ plan, planMeta, loading }: Props) {
         </p>
         <h3 className="mt-3 text-2xl font-semibold">{plan.title}</h3>
         {planMeta ? (
-          <p className="mt-4 rounded-2xl bg-cyan-500/10 px-4 py-3 text-sm leading-7 text-cyan-100">
-            {planMeta.mode === "local-kb-plus-ocr"
-              ? INSTRUMENTATION_COPY.recommendationModeOcr
-              : INSTRUMENTATION_COPY.recommendationModeLocal}
-          </p>
+          <div className="mt-4 space-y-3">
+            <p className="rounded-2xl bg-cyan-500/10 px-4 py-3 text-sm leading-7 text-cyan-100">
+              {planMeta.mode === "local-kb-plus-ocr"
+                ? INSTRUMENTATION_COPY.recommendationModeOcr
+                : INSTRUMENTATION_COPY.recommendationModeLocal}
+            </p>
+            {planMeta.version ? (
+              <p className="text-xs uppercase tracking-[0.18em] text-cyan-200/80">
+                {INSTRUMENTATION_COPY.versionLabel}: {planMeta.version}
+              </p>
+            ) : null}
+          </div>
         ) : null}
       </section>
 
