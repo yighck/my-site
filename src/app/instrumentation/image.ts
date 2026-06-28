@@ -8,7 +8,7 @@ export function validateInstrumentationImage(file: File) {
   }
 
   if (file.size > MAX_UPLOAD_BYTES) {
-    return "图片请控制在 5 MB 以内。";
+    return "图片大小请控制在 5 MB 以内。";
   }
 
   return null;
@@ -22,6 +22,7 @@ export async function compressInstrumentationImage(file: File) {
         resolve(reader.result);
         return;
       }
+
       reject(new Error("图片读取失败。"));
     };
     reader.onerror = () => reject(new Error("图片读取失败。"));

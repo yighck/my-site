@@ -66,17 +66,24 @@ interface OcrExtractionResult {
   usage: OcrUsage;
 }
 
+interface SimplePlanSection {
+  title: string;
+  items: string[];
+}
+
+interface SimplePlan {
+  title: string;
+  judgement: string;
+  overview: string;
+  modules: SimplePlanSection[];
+  tuningSteps: string[];
+  risks: string[];
+  verification: string[];
+}
+
 interface PlanResponseMeta {
   mode: "local-kb" | "local-kb-plus-ocr";
-  ocrAttempted: boolean;
   ocrUsed: boolean;
-  ocrBudget: {
-    totalBudget: number;
-    totalUsed: number;
-    remaining: number;
-    requestReserve: number;
-  };
-  ocrUsage?: OcrUsage;
   budgetNotice?: string;
 }
 
@@ -95,9 +102,9 @@ function shouldRunImageOcr(topic: string | undefined, imageDataUrl: string | und
 function buildVisionPrompt() {
   return [
     "你只负责识别图片里的电赛题目文字，不负责生成方案。",
-    "尽量完整提取目标、指标、限制条件、输入输出要求和评分相关内容。",
+    "请尽量完整提取目标、指标、限制条件、输入输出要求和评分相关内容。",
     "如果图片里有分条、编号或表格，请保留原有结构。",
-    "不要编造缺失内容，不要补建议，只输出提取后的题目文字。",
+    "不要编造缺失内容，不要补充建议，只输出提取后的题目文字。",
   ].join("\n");
 }
 
@@ -207,14 +214,14 @@ function buildBudgetNotice(state: OcrBudgetState, usage?: OcrUsage, forcedTextOn
   const remaining = Math.max(0, state.totalBudget - state.totalUsed);
 
   if (forcedTextOnly) {
-    return `OCR 总预算受 1M 以内硬上限约束，当前已自动切换为纯本地蒸馏推荐。剩余预算约 ${remaining} 令牌。`;
+    return `OCR 预算已接近上限，当前已自动切换为仅使用本地知识库。剩余可用预算约 ${remaining} 令牌。`;
   }
 
   if (!usage || usage.totalTokens <= 0) {
-    return `本次未走模型生成方案；文本题目直接使用本地蒸馏知识库。当前 OCR 预算仍受 1M 以内硬上限约束，剩余约 ${remaining} 令牌。`;
+    return `本次未使用 OCR，方案直接来自本地知识库。当前剩余 OCR 预算约 ${remaining} 令牌。`;
   }
 
-  return `本次仅在识图阶段消耗了 ${usage.totalTokens} 令牌，方案推荐仍然完全来自本地蒸馏知识库。当前 OCR 总预算保持在 1M 以内，剩余约 ${remaining} 令牌。`;
+  return `本次 OCR 识别消耗约 ${usage.totalTokens} 令牌，方案生成仍然主要依赖本地知识库。当前剩余 OCR 预算约 ${remaining} 令牌。`;
 }
 
 async function extractProblemTextFromImage(
@@ -276,8 +283,37 @@ async function extractProblemTextFromImage(
   };
 }
 
-function finalizePlan(plan: RecommendedPlan) {
-  return plan;
+function joinCleanLines(lines: Array<string | undefined>) {
+  return lines
+    .map((line) => line?.trim())
+    .filter((line): line is string => Boolean(line))
+    .join(" ");
+}
+
+function ensureList(items: string[] | undefined, fallback: string[]) {
+  return items && items.length ? items : fallback;
+}
+
+function simplifyPlan(plan: RecommendedPlan): SimplePlan {
+  const referencesText = plan.references?.length ? `参考题源：${plan.references.join("、")}。` : "";
+  const matchedText = plan.matchedTerms?.length ? `识别关键词：${plan.matchedTerms.join("、")}。` : "";
+  const reasoningText = plan.reasoning?.length ? `判断依据：${plan.reasoning.join("；")}。` : "";
+
+  return {
+    title: plan.title || "电赛题目方案建议",
+    judgement: joinCleanLines([
+      plan.detectedFamily ? `题型判断：${plan.detectedFamily}。` : "",
+      plan.summary,
+      matchedText,
+      reasoningText,
+      referencesText,
+    ]),
+    overview: joinCleanLines([plan.approach]),
+    modules: plan.modules?.filter((module) => module.items?.length) ?? [],
+    tuningSteps: ensureList(plan.tuningSteps, ["先保证主链路可运行，再逐项校准关键指标。"]),
+    risks: ensureList(plan.risks, ["优先关注指标闭环、量程切换和误差来源。"]),
+    verification: ensureList(plan.verification, ["先验证基础功能，再验证边界条件和最终指标。"]),
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -290,7 +326,7 @@ export async function POST(request: NextRequest) {
   if (!topic && !imageDataUrl) {
     return NextResponse.json(
       {
-        error: "请至少提供题目文字或题目截图。",
+        error: "请至少提供题目文字或题目图片。",
       },
       { status: 400 },
     );
@@ -299,7 +335,7 @@ export async function POST(request: NextRequest) {
   if (imageDataUrl && !apiKey && !topic) {
     return NextResponse.json(
       {
-        error: "当前只上传图片时需要配置 OpenAI OCR 接口密钥，例如 OPENAI_API_KEY。",
+        error: "当前只有图片输入时，需要先配置 OCR 所需的 OPENAI_API_KEY。",
       },
       { status: 500 },
     );
@@ -308,7 +344,6 @@ export async function POST(request: NextRequest) {
   let mergedTopic = topic ?? "";
   let budgetState = await readOcrBudgetState();
   let ocrUsage: OcrUsage | undefined;
-  let ocrAttempted = false;
   let ocrUsed = false;
   let forcedTextOnly = false;
 
@@ -318,8 +353,6 @@ export async function POST(request: NextRequest) {
     if (remainingBudget < OCR_REQUEST_TOKEN_RESERVE) {
       forcedTextOnly = true;
     } else {
-      ocrAttempted = true;
-
       try {
         const extracted = await extractProblemTextFromImage(apiKey as string, imageDataUrl as string, model);
         ocrUsage = extracted.usage;
@@ -357,25 +390,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: forcedTextOnly
-          ? "当前 OCR 预算已受限，请补充题目文字后再生成方案。"
-          : "未能从图片中提取有效题目文字，请补一段文字说明后重试。",
+          ? "当前 OCR 预算不足，请补充题目文字后再生成方案。"
+          : "未能从图片中提取有效题目文字，请补充文字说明后再试。",
       },
       { status: 400 },
     );
   }
 
-  const plan = finalizePlan(recommendPlanFromDistilledData(mergedTopic, "zh"));
+  const plan = simplifyPlan(recommendPlanFromDistilledData(mergedTopic, "zh"));
   const meta: PlanResponseMeta = {
     mode: ocrUsed ? "local-kb-plus-ocr" : "local-kb",
-    ocrAttempted,
     ocrUsed,
-    ocrBudget: {
-      totalBudget: budgetState.totalBudget,
-      totalUsed: budgetState.totalUsed,
-      remaining: Math.max(0, budgetState.totalBudget - budgetState.totalUsed),
-      requestReserve: OCR_REQUEST_TOKEN_RESERVE,
-    },
-    ocrUsage,
     budgetNotice: buildBudgetNotice(budgetState, ocrUsage, forcedTextOnly),
   };
 

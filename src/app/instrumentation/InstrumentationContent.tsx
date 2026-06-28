@@ -5,7 +5,6 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { EXAMPLE_TOPICS, INSTRUMENTATION_COPY } from "./content";
 import { compressInstrumentationImage, validateInstrumentationImage } from "./image";
-import { localizeDisplayValue } from "./result-utils";
 import ResultView from "./ResultView";
 import type { InstrumentationResponse, InstrumentationPlan, PlanMeta } from "./types";
 
@@ -98,13 +97,11 @@ export default function InstrumentationContent() {
         throw new Error(data?.error || INSTRUMENTATION_COPY.requestFailed);
       }
 
-      setPlan(localizeDisplayValue(data.plan));
+      setPlan(data.plan);
       setPlanMeta(data.meta ?? null);
     } catch (submissionError) {
       setError(
-        submissionError instanceof Error
-          ? submissionError.message
-          : INSTRUMENTATION_COPY.requestFailed,
+        submissionError instanceof Error ? submissionError.message : INSTRUMENTATION_COPY.requestFailed,
       );
     } finally {
       setLoading(false);
@@ -132,9 +129,7 @@ export default function InstrumentationContent() {
       })
       .catch((imageError) => {
         setError(
-          imageError instanceof Error
-            ? imageError.message
-            : INSTRUMENTATION_COPY.imageReadError,
+          imageError instanceof Error ? imageError.message : INSTRUMENTATION_COPY.imageReadError,
         );
         setImageStatus("");
       });
@@ -143,8 +138,8 @@ export default function InstrumentationContent() {
 
   return (
     <main ref={scope} className="relative overflow-hidden">
-      <div className="solver-orb gpu-float pointer-events-none absolute left-8 top-20 h-44 w-44 rounded-full bg-amber-400/18 blur-3xl dark:bg-amber-400/12" />
-      <div className="solver-orb gpu-float pointer-events-none absolute right-0 top-44 h-64 w-64 rounded-full bg-cyan-500/16 blur-3xl dark:bg-cyan-500/16" />
+      <div className="solver-orb pointer-events-none absolute left-8 top-20 h-44 w-44 rounded-full bg-amber-400/18 blur-3xl dark:bg-amber-400/12" />
+      <div className="solver-orb pointer-events-none absolute right-0 top-44 h-64 w-64 rounded-full bg-cyan-500/16 blur-3xl dark:bg-cyan-500/16" />
 
       <section className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_22rem] lg:items-start">
