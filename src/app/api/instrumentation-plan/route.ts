@@ -19,7 +19,7 @@ const OPENAI_API_URL = `${OPENAI_BASE_URL}/responses`;
 const DEFAULT_OCR_MODEL = process.env.OPENAI_OCR_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini";
 const OCR_OUTPUT_TOKEN_LIMIT = 480;
 const OCR_TEXT_PRIORITY_THRESHOLD = 96;
-const HARD_OCR_TOTAL_TOKEN_BUDGET_CAP = 10_000_000;
+const HARD_OCR_TOTAL_TOKEN_BUDGET_CAP = 1_000_000;
 const OCR_BUDGET_FILE = path.join(process.cwd(), "data", "instrumentation-ocr-budget.json");
 
 function parsePositiveIntegerEnv(value: string | undefined, fallback: number, cap?: number) {
@@ -224,19 +224,19 @@ function buildBudgetNotice(
 
   if (forcedTextOnly) {
     return lang === "zh"
-      ? `OCR 总预算受 10M 以内硬上限约束，当前已自动切换为纯本地蒸馏推荐。剩余预算约 ${remaining} tokens。`
-      : `OCR is constrained by a hard under-10M global budget, so this request fell back to local distilled recommendation only. Remaining budget is about ${remaining} tokens.`;
+      ? `OCR 总预算受 1M 以内硬上限约束，当前已自动切换为纯本地蒸馏推荐。剩余预算约 ${remaining} tokens。`
+      : `OCR is constrained by a hard under-1M global budget, so this request fell back to local distilled recommendation only. Remaining budget is about ${remaining} tokens.`;
   }
 
   if (!usage || usage.totalTokens <= 0) {
     return lang === "zh"
-      ? `本次未走模型生成方案；文本题目直接使用本地蒸馏知识库。当前 OCR 预算仍受 10M 以内硬上限约束，剩余约 ${remaining} tokens。`
-      : `This request did not use model generation; text problems go straight through the local distilled knowledge base. OCR remains under a hard sub-10M global budget, with about ${remaining} tokens left.`;
+      ? `本次未走模型生成方案；文本题目直接使用本地蒸馏知识库。当前 OCR 预算仍受 1M 以内硬上限约束，剩余约 ${remaining} tokens。`
+      : `This request did not use model generation; text problems go straight through the local distilled knowledge base. OCR remains under a hard sub-1M global budget, with about ${remaining} tokens left.`;
   }
 
   return lang === "zh"
-    ? `本次仅在识图阶段消耗了 ${usage.totalTokens} tokens，方案推荐仍然完全来自本地蒸馏知识库。当前 OCR 总预算保持在 10M 以内，剩余约 ${remaining} tokens。`
-    : `This request used ${usage.totalTokens} tokens only for OCR. The recommendation still came entirely from the local distilled knowledge base, and total OCR usage remains under 10M. Remaining budget is about ${remaining} tokens.`;
+    ? `本次仅在识图阶段消耗了 ${usage.totalTokens} tokens，方案推荐仍然完全来自本地蒸馏知识库。当前 OCR 总预算保持在 1M 以内，剩余约 ${remaining} tokens。`
+    : `This request used ${usage.totalTokens} tokens only for OCR. The recommendation still came entirely from the local distilled knowledge base, and total OCR usage remains under 1M. Remaining budget is about ${remaining} tokens.`;
 }
 
 async function extractProblemTextFromImage(

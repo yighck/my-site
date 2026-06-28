@@ -323,6 +323,20 @@ export interface DistilledModuleMetricRule {
 
 const t = (en: string, zh = en): RichLocalizedText => ({ en, zh });
 const tl = (...items: string[]) => items.map((item) => t(item));
+const profileHeadlineZh: Record<string, string> = {
+  parameter: "先用已知激励驱动被测对象，稳定提取幅值和相位，再反推出电参数。",
+  distortion: "先锁定周期与采样关系，再用一条稳定 FFT 链路证明谐波和 THD 结果可信。",
+  cable: "先选定一条线缆判别路线，再从稳定特征中估计长度和终端状态。",
+  "adaptive-filtering": "用参考驱动的自适应闭环，展示收敛、抑制效果和工况变化后的恢复能力。",
+  receiver: "先把真正的锁定条件定义清楚，再演示受扰下的失锁与重锁。",
+  localization: "先稳定一个测距观测量，再结合标定后的几何关系解出位置。",
+  "vision-measurement": "先完成视觉几何标定，再把图像特征转换为物理量测量结果。",
+  "networked-measurement": "在网络传输链路中保持本地测量真值可追踪，并把时序与完整性显式展示出来。",
+  modulation: "先识别波形所属调制家族，再估计载波、符号率或调制度等关键参数。",
+  "load-analysis": "把同步采集到的电特征映射成负载类别，并能解释类别边界为什么成立。",
+  separation: "从混合信号中恢复有意义的分量，并证明每一路输出到底代表什么。",
+  model: "从实测响应中恢复紧凑模型，再用留出样本回放验证模型是否站得住。",
+};
 
 const profileFamilies: Record<string, string> = {
   parameter: "Electrical parameter testing",
@@ -727,7 +741,7 @@ const familyConfig = [
 
 export const instrumentationFamilyPlaybooks: DistilledFamilyPlaybook[] = familyConfig.map((item) => ({
   profileId: item.profileId,
-  headline: t(item.headline),
+  headline: t(item.headline, profileHeadlineZh[item.profileId] ?? item.headline),
   keywordBoosts: [{ terms: profileKeywords[item.profileId], weight: item.profileId === "adaptive-filtering" ? 6 : 5 }],
   diagnosisCues: tl(...item.diagnosis),
   principleChoices: tl(...item.principles),
