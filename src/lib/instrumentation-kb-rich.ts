@@ -321,7 +321,31 @@ export interface DistilledModuleMetricRule {
   fallbackTriggers: RichLocalizedText[];
 }
 
-const t = (en: string, zh = en): RichLocalizedText => ({ en, zh });
+const zhTextOverrides: Record<string, string> = {
+  "The final answer is an electrical quantity, not only a stable waveform.": "最终答案应是电学参数，不只是一个看起来稳定的波形。",
+  "Phase and amplitude ratio usually matter more than visual smoothness.": "相位和幅值比通常比波形看起来是否顺滑更重要。",
+  "Lock one trusted frequency point before adding wide sweep behavior.": "先锁定一个可信频点，再扩展扫频能力。",
+  "Treat calibration as part of the measurement chain, not as a late patch.": "把标定当成测量链路的一部分，而不是最后再补的修饰。",
+  "Stimulus source -> dual-channel capture -> amplitude and phase extraction -> parameter solver.": "激励源 -> 双通道采集 -> 幅相提取 -> 参数求解。",
+  "Range integrity and reference integrity must stay visible during the demo.": "演示时必须让量程状态和参考基准都保持可见、可解释。",
+  "A stable parameter readout with at least one known reference sample.": "至少要给出一个已知参考样件下稳定可复现的参数读数。",
+  "A clear explanation of range switching or solver limits.": "要能清楚说明量程切换逻辑或求解器边界条件。",
+  "Explain which observables enter the solver and why they are sufficient.": "说明哪些可观测量进入了求解器，以及它们为什么足够。",
+  "Explain how gain, offset, and phase bias are calibrated out.": "说明增益、零点偏置和相位偏差是如何被标定消除的。",
+  "Hardware front-end drift is hidden under software fitting.": "硬件前端漂移被软件拟合掩盖，答辩时很容易被问穿。",
+  "The team shows a number but cannot close the phase error budget.": "队伍虽然能报数，但无法闭环解释相位误差预算。",
+  "Add sweep-based validation or consistency checks across multiple reference parts.": "进一步加分可以做扫频一致性验证，或增加多个参考件的交叉校验。",
+  "A stable clock, known reference path, and observable front-end states are mandatory.": "稳定时钟、已知参考路径、可观测前端状态，这三项是仪表题共性底座。",
+  "Keep debug outputs visible enough that the team can explain the chain live.": "调试输出要保留到能现场解释整条测量链路为止。",
+  "Reference drift, front-end saturation, timing skew, and untracked range changes are common score killers.": "参考漂移、前端饱和、时序偏斜、量程切换失控，都是典型失分点。",
+  "If the physical observable is unstable, software polish cannot rescue the answer.": "如果物理可观测量本身不稳定，软件再精致也救不回来。",
+  "What raw observable is trusted before the final solver or classifier runs?": "在最终求解或分类之前，最可信的原始可观测量是什么？",
+  "Which calibration step most reduces the final error?": "哪一步标定对最终误差下降最关键？",
+  "Add more edge cases only after the baseline route is stable.": "先把基线路线做稳，再去补更多边界情况。",
+  "National-level polish usually comes from error closure and robustness, not from a brand-new architecture.": "国奖级提升通常来自误差闭环和鲁棒性，而不是推倒重来换架构。",
+};
+
+const t = (en: string, zh = zhTextOverrides[en] ?? en): RichLocalizedText => ({ en, zh });
 const tl = (...items: string[]) => items.map((item) => t(item));
 const profileHeadlineZh: Record<string, string> = {
   parameter: "先用已知激励驱动被测对象，稳定提取幅值和相位，再反推出电参数。",
