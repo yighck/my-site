@@ -397,6 +397,53 @@ const zhTextOverrides: Record<string, string> = {
   "Range-boundary replay": "量程边界回放验证",
   "Do not use this route when even one anchor point is still unstable.": "如果连一个锚点都还不稳定，就不要走这条路线。",
   "Broader than a single-point inversion route, but only worthwhile after one calibrated point already closes cleanly.": "它比单点反演覆盖更广，但前提是至少已有一个已标定工作点完全跑稳。",
+  "MCU or DSP with deterministic sampling and enough RAM for capture buffers.": "需要具备确定性采样能力且缓存充足的 MCU 或 DSP。",
+  "Stable analog front-end with protection, scaling, and debug access.": "需要稳定的模拟前端，并具备保护、量程缩放和调试观测口。",
+  "Add a cleaner reference source or better clock before adding complex algorithms.": "先补更干净的参考源或更好的时钟，再考虑复杂算法。",
+  "Use external ADC or comparator support only if the baseline route proves bandwidth-limited.": "只有在基线路线明确受带宽限制时，再引入外部 ADC 或比较器。",
+  "Prepare at least one known-good reference source and one known-bad stress case.": "至少准备一个已知正常参考源和一个已知极限压力样例。",
+  "Keep scope and serial logging available during every integration step.": "每一步联调都保留示波器观测和串口日志。",
+  "Zero or offset first, gain second, timing or phase third, and algorithm correction last.": "标定顺序优先是零点，其次增益，再是时序或相位，最后才是算法补偿。",
+  "Re-run a small fixed checklist after every front-end change.": "每次改前端后都要重跑一份固定小检查单。",
+  "Save one short calibration table and one short failure checklist.": "保留一页精简标定表和一页精简故障排查表。",
+  "Keep one frozen demo route that can survive time pressure.": "保留一条在比赛压力下也能稳定演示的冻结路线。",
+  "Main metric jumps when the operating point changes slightly.": "工作点轻微变化时主指标大幅跳动。",
+  "A good-looking plot does not match the final scored number.": "图看起来不错，但和最终评分数值对不上。",
+  "Confirm reference integrity, timing integrity, and front-end range selection.": "先确认参考完整性、时序完整性和前端量程选择是否正确。",
+  "Compare current behavior against the last known-good benchmark capture.": "把当前表现和最近一次已知正常的基准采样对比。",
+  "Untracked calibration drift, timing skew, saturation, or wrong physical assumptions.": "常见根因包括标定漂移失控、时序偏斜、饱和和物理假设错误。",
+  "Late-stage algorithm changes without restoring baseline measurements.": "临近结束时改算法，却没有回到基线测量重新验证。",
+  "Freeze to one trusted range and one trusted test case.": "先冻结到一个可信量程和一个可信测试样例。",
+  "Reduce the claim to the part of the chain that is still repeatable and defendable.": "把结论收缩到仍然可复现、可答辩的那部分链路。",
+  "Our design locks the raw observable before solving the final scored output.": "我们的方案先锁定原始可观测量，再去求最终评分结果。",
+  "First we define the physical observable, then we show how the front end preserves it, then how the algorithm converts it into the final answer.": "我们先定义物理可观测量，再说明前端如何保住它，最后说明算法如何把它变成最终答案。",
+  "Finally we close the error loop with calibration, boundary cases, and repeatability checks.": "最后再用标定、边界情况和重复性验证把误差闭环补齐。",
+  "We separate hardware error, timing error, and algorithm error instead of blending them together.": "我们把硬件误差、时序误差和算法误差分开处理，而不是混在一起。",
+  "The biggest gain came from stabilizing the measurement chain before expanding the feature set.": "最大的提升来自先把测量链路做稳，而不是先堆更多特征。",
+  "Start from a known bench case, show the raw observable, then show the final result.": "演示时先从一个已知台架样例开始，先看原始可观测量，再看最终结果。",
+  "End with one edge case that proves the route is not overfit to a single example.": "最后加一个边界样例，证明路线不是只对单一样例过拟合。",
+  "One stable route with a truthful final metric.": "至少有一条稳定路线，并给出真实可信的最终指标。",
+  "No hidden resets, silent saturation, or unexplained range changes.": "不能有隐藏复位、静默饱和或说不清的量程切换。",
+  "Repeatability survives multiple runs and a small operating-point change.": "在多次重复和轻微工作点变化下仍保持重复性。",
+  "The defense story is consistent with the observed data.": "答辩口径要和观测到的数据一致。",
+  "Robustness holds under broader cases and tighter error budgets.": "在更宽的工况和更紧的误差预算下仍具备鲁棒性。",
+  "The team can explain both success cases and failure boundaries cleanly.": "队伍不仅能解释成功样例，也能清楚说明失败边界。",
+  "Bring up excitation, sampling, display, and logging as early as possible.": "尽早打通激励、采样、显示和日志。",
+  "Record one known benchmark capture before writing advanced logic.": "在写复杂逻辑之前，先录下一份已知正确的基准采样。",
+  "Stabilize the family's raw observable and its calibration flow.": "先把该题型的原始可观测量和标定流程做稳。",
+  "Write the smallest useful solver or classifier around that observable.": "围绕该可观测量实现最小可用的求解器或分类器。",
+  "Add family-specific edge cases and one defense-oriented benchmark.": "再补题型特有的边界情况和一个面向答辩的基准样例。",
+  "Keep architecture changes smaller than the validation loop.": "架构改动的节奏不要快过验证闭环。",
+  "Run a frozen architecture with only bug fixes allowed.": "模赛阶段只允许修 bug，不再大改架构。",
+  "Practice one concise measurement-chain story and one concise error-budget story.": "训练一套精简的测量链路话术和一套精简的误差预算话术。",
+  "Low-distortion drive source.": "低失真驱动信号源。",
+  "Headroom-rich analog front end.": "前端动态余量充足的模拟链路。",
+  "One reference source path that can be replayed whenever drive level or compensation logic is extended.": "保留一条参考信号源链路，在扩展驱动幅度或补偿逻辑时都能随时回放验证。",
+  "Front-end linearity check.": "前端线性度检查。",
+  "Known harmonic injection.": "已知谐波注入样例。",
+  "One replay where the same clean-source baseline is checked before and after drive-level expansion.": "在同一干净信号基线下，回放验证扩展驱动幅度前后结果是否一致。",
+  "Separate DUT distortion from instrument distortion.": "把被测对象失真和仪器自身失真分开说明。",
+  "If this route later supports compensation or adaptive stories, keep one plain harmonic-truth benchmark visible on its own.": "如果这条路线后续还要扩展到补偿或自适应叙事，务必单独保留一个纯粹的谐波真值基准样例。",
 };
 
 const zhFamilyLabelMap: Array<[string, string]> = [
@@ -439,10 +486,22 @@ function localizeRichZh(text: string): string {
     .replace(/^Strong cue:\s*(.+)\.$/g, "强触发词：$1。")
     .replace(/^Weak cue:\s*(.+)\.$/g, "弱触发词：$1。")
     .replace(/^One (.+) benchmark\.$/g, "一组$1基准样例。")
+    .replace(/^One (.+) benchmark source\.$/g, "一个$1基准信号源。")
+    .replace(/^One (.+) benchmark sample\.$/g, "一个$1基准样例。")
+    .replace(/^One (.+) benchmark set\.$/g, "一组$1基准样例集合。")
+    .replace(/^One (.+) benchmark table\.$/g, "一张$1基准对照表。")
+    .replace(/^One fixed (.+)\.$/g, "一套固定的$1。")
     .replace(/^Known (.+) benchmark\.$/g, "已知$1基准样例。")
+    .replace(/^Known (.+) benchmark source\.$/g, "已知$1基准信号源。")
+    .replace(/^Known (.+) benchmark set\.$/g, "已知$1基准样例集合。")
+    .replace(/^Known (.+) benchmark table\.$/g, "已知$1基准对照表。")
     .replace(/^Known (.+) source\.$/g, "已知$1信号源。")
     .replace(/^Known (.+) set\.$/g, "已知$1样例集合。")
     .replace(/^Known (.+) table\.$/g, "已知$1对照表。")
+    .replace(/^Known (.+) references\.$/g, "已知$1参考样例。")
+    .replace(/^Known (.+) samples\.$/g, "已知$1样件。")
+    .replace(/^Known (.+) signatures\.$/g, "已知$1特征样例。")
+    .replace(/^Known (.+) fixtures\.$/g, "已知$1夹具。")
     .replace(/^Show (.+) first, then (.+)\.$/g, "先展示$1，再展示$2。")
     .replace(/^Replay (.+) first\.$/g, "先回放$1。")
     .replace(/^Rebuild (.+) first\.$/g, "先重建$1。")
@@ -458,7 +517,46 @@ function localizeRichZh(text: string): string {
     .replace(/^Do not add (.+) before (.+)\.$/g, "在$2之前，不要增加$1。")
     .replace(/^Do not let (.+) hide (.+)\.$/g, "不要让$1掩盖$2。")
     .replace(/^If (.+), keep (.+)\.$/g, "如果$1，就保留$2。")
-    .replace(/^Then add (.+)\.$/g, "然后再增加$1。");
+    .replace(/^Then add (.+)\.$/g, "然后再增加$1。")
+    .replace(/^Metric first, extra views second\.$/g, "先保住主指标，再补额外视图。")
+    .replace(/^Anchor spectrum first, wider span second\.$/g, "先锁定锚点频谱，再扩展频谱跨度。")
+    .replace(/^Measured curve first, replay summary second\.$/g, "先展示实测曲线，再给出回放式总结。")
+    .replace(/^Reference resistor first, wider range second\.$/g, "先验证参考电阻，再扩展更宽量程。")
+    .replace(/^Anchor point first, wider sweep second\.$/g, "先锁定锚点，再扩展更宽扫频。")
+    .replace(/^State first, length second\.$/g, "先判状态，再估长度。")
+    .replace(/^Known sample first, unknown sample second\.$/g, "先测已知样件，再测未知样件。")
+    .replace(/^Known target, then changed pose\.$/g, "先测已知目标，再验证姿态变化。")
+    .replace(/^Lock, unlock, relock in sequence\.$/g, "按锁定、失锁、重锁的顺序演示。")
+    .replace(/^Fit result, then held-out replay\.$/g, "先给出拟合结果，再做留出样例回放验证。")
+    .replace(/^Start with state discrimination, then add length\.$/g, "先做状态判别，再补长度求解。")
+    .replace(/^Show spectrum and THD together\.$/g, "频谱和 THD 一起展示。")
+    .replace(/^Show raw cue, then final location\.$/g, "先展示原始线索，再给出最终位置。")
+    .replace(/^Show features, then final label\.$/g, "先展示特征，再给出最终标签。")
+    .replace(/^Show trend across drive levels\.$/g, "展示不同驱动幅度下的趋势变化。")
+    .replace(/^Show same event on both ends\.$/g, "在本地端和远端同时展示同一个事件。")
+    .replace(/^Show local result, then remote consistency\.$/g, "先展示本地结果，再展示远端一致性。")
+    .replace(/^Show lock and channel identity first, then recovered audio\.$/g, "先展示锁定状态和通道身份，再展示恢复出的音频。")
+    .replace(/^Show the family cue path before the final recovered result\.$/g, "先展示题族判别线索链路，再展示最终恢复结果。")
+    .replace(/^Show the family cue first, then output the estimated parameter\.$/g, "先展示题族判别线索，再输出估计参数。")
+    .replace(/^Show the local response, then prove the remote side preserves it\.$/g, "先展示本地响应，再证明远端保留了同一结果。")
+    .replace(/^Show monitored electrical features first, then final identification\.$/g, "先展示监测到的电气特征，再给出最终识别结论。")
+    .replace(/^Show the benchmark pair first, then the measured phase\.$/g, "先展示基准对，再给出测得的相位结果。")
+    .replace(/^Show the sequence first, then the captured trace\.$/g, "先展示基准序列，再展示采集到的波形轨迹。")
+    .replace(/^Show local node truth first, then remote monitoring consistency\.$/g, "先展示本地节点真值，再展示远端监测一致性。")
+    .replace(/^Show the local reading first, then the remote mirror\.$/g, "先展示本地读数，再展示远端镜像结果。")
+    .replace(/^Show the sensed current cue first, then the harmonic result\.$/g, "先展示电流观测线索，再展示谐波结果。")
+    .replace(/^Show receive-side cue first, then recovered speech\.$/g, "先展示接收端线索，再展示恢复出的语音。")
+    .replace(/^Show the uncompensated benchmark first, then the compensated replay\.$/g, "先展示未补偿基准样例，再展示补偿后回放结果。")
+    .replace(/^Show voltage-current observables first, then the power result\.$/g, "先展示电压电流观测量，再给出功率结果。")
+    .replace(/^Show the intermediate cue first, then the final label or parameter\.$/g, "先展示中间线索，再给出最终标签或参数。")
+    .replace(/^Show the benchmark recording first, then the shielding result\.$/g, "先展示基准录音，再展示屏蔽结果。")
+    .replace(/^Show the voltage-current benchmark first, then the load-test result\.$/g, "先展示电压电流基准样例，再给出负载测试结果。")
+    .replace(/^Show the local sample first, then the remote mirror\.$/g, "先展示本地样例，再展示远端镜像结果。")
+    .replace(/^Show the timing observable first, then the frequency value\.$/g, "先展示时序观测量，再给出频率数值。")
+    .replace(/^Show the benchmark source first, then the meter result\.$/g, "先展示基准信号源，再给出仪表结果。")
+    .replace(/^Show live capture first, then stored replay\.$/g, "先展示实时采集，再展示存储回放。")
+    .replace(/^Known device first, then unknown device\.$/g, "先测已知器件，再测未知器件。")
+    .replace(/^Anchor benchmark first, span expansion second\.$/g, "先锁定锚点基准，再扩展频谱跨度。");
 
   if (/^[A-Za-z0-9][A-Za-z0-9\s\-_/,:;.()]+$/.test(result) && /[A-Za-z]/.test(result)) {
     result = result
