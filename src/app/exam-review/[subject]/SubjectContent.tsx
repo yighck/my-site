@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { useTranslation } from "@/i18n/LanguageContext";
 import ConceptCard from "@/components/exam/ConceptCard";
 import PracticeQuiz from "@/components/exam/PracticeQuiz";
 import SummarySection from "@/components/exam/SummarySection";
@@ -15,16 +14,12 @@ gsap.registerPlugin(useGSAP);
 type Tab = "summary" | "concepts" | "practice" | "tips";
 
 interface Props {
-  contentEn: SubjectContentData | null;
-  contentZh: SubjectContentData | null;
+  content: SubjectContentData;
 }
 
-export default function SubjectContent({ contentEn, contentZh }: Props) {
-  const { lang, t } = useTranslation();
+export default function SubjectContent({ content }: Props) {
   const [tab, setTab] = useState<Tab>("summary");
   const scope = useRef<HTMLElement>(null);
-
-  const content = (lang === "zh" ? contentZh : contentEn) ?? contentZh ?? contentEn;
 
   useGSAP(
     () => {
@@ -86,33 +81,33 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
     { scope, dependencies: [tab], revertOnUpdate: true },
   );
 
-  if (!content) {
-    return null;
-  }
-
   const tabs: { key: Tab; label: string; count: string }[] = [
-    { key: "summary", label: t.exam.tabSummary, count: content.summary ? "01" : "00" },
-    { key: "concepts", label: t.exam.tabConcepts, count: String(content.concepts.length).padStart(2, "0") },
-    { key: "practice", label: t.exam.tabPractice, count: String(content.practice.length).padStart(2, "0") },
-    { key: "tips", label: t.exam.tabTips, count: content.tips ? "01" : "00" },
+    { key: "summary", label: "知识总结", count: content.summary ? "01" : "00" },
+    { key: "concepts", label: "概念卡片", count: String(content.concepts.length).padStart(2, "0") },
+    { key: "practice", label: "练习题", count: String(content.practice.length).padStart(2, "0") },
+    { key: "tips", label: "复习提示", count: content.tips ? "01" : "00" },
   ];
 
   const metrics = [
     {
-      label: t.exam.metricConceptCards,
+      label: "概念卡片",
       value: content.concepts.length,
     },
     {
-      label: t.exam.metricPracticeSets,
+      label: "练习题",
       value: content.practice.length,
     },
     {
-      label: t.exam.metricStudyModes,
+      label: "复习模块",
       value: 4,
     },
   ];
 
-  const sideNotes = [t.exam.subjectStep1, t.exam.subjectStep2, t.exam.subjectStep3];
+  const sideNotes = [
+    "先打开知识总结，把本章结构和主线重新串起来。",
+    "概念卡片适合反复翻，看定义、公式和关键术语。",
+    "练习题尽量一口气做完，再回到复习提示补漏洞。",
+  ];
 
   return (
     <main ref={scope} className="relative overflow-hidden">
@@ -125,7 +120,7 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
           className="subject-back inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/75 px-4 py-2 text-sm font-medium text-slate-600 backdrop-blur transition-colors hover:text-slate-950 dark:border-white/10 dark:bg-white/6 dark:text-slate-300 dark:hover:text-white"
         >
           <span>{"<"}</span>
-          <span>{t.exam.backToSubjects}</span>
+          <span>返回科目列表</span>
         </Link>
 
         <div className="subject-hero mt-6 rounded-[34px] border border-white/60 bg-white/80 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/68">
@@ -135,13 +130,13 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
                 {content.subject.icon}
               </div>
               <p className="mt-6 text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                {t.exam.subjectBoardLabel}
+                科目面板
               </p>
               <h1 className="mt-3 text-[clamp(2.4rem,4.5vw,4.2rem)] font-semibold tracking-tight text-slate-950 dark:text-white">
-                {lang === "zh" ? content.subject.name.zh : content.subject.name.en}
+                {content.subject.name.zh}
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-300">
-                {lang === "zh" ? content.subject.description.zh : content.subject.description.en}
+                {content.subject.description.zh}
               </p>
             </div>
 
@@ -169,15 +164,22 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
             return (
               <button
                 key={item.key}
+                type="button"
                 onClick={() => setTab(item.key)}
                 className={`subject-tab inline-flex items-center gap-3 rounded-full px-5 py-3 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-slate-950 text-white shadow-lg shadow-slate-950/15 dark:bg-cyan-300 dark:text-slate-950"
+                    ? "bg-slate-950 text-white dark:bg-cyan-300 dark:text-slate-950"
                     : "border border-slate-200/80 bg-white/80 text-slate-600 hover:text-slate-950 dark:border-white/10 dark:bg-white/6 dark:text-slate-300 dark:hover:text-white"
                 }`}
               >
                 <span>{item.label}</span>
-                <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${active ? "bg-white/15 dark:bg-slate-950/12" : "bg-slate-100 dark:bg-white/10"}`}>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                    active
+                      ? "bg-white/15 text-white dark:bg-slate-950/10 dark:text-slate-950"
+                      : "bg-slate-100 text-slate-500 dark:bg-white/8 dark:text-slate-300"
+                  }`}
+                >
                   {item.count}
                 </span>
               </button>
@@ -193,7 +195,7 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
                   <SummarySection content={content.summary} />
                 ) : (
                   <div className="rounded-[28px] border border-dashed border-slate-300 bg-white/70 p-8 text-slate-500 dark:border-white/12 dark:bg-white/5 dark:text-slate-400">
-                    {t.exam.emptySummary}
+                    暂时还没有知识总结。
                   </div>
                 )}
               </div>
@@ -212,7 +214,7 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
                   ))
                 ) : (
                   <div className="rounded-[28px] border border-dashed border-slate-300 bg-white/70 p-8 text-slate-500 dark:border-white/12 dark:bg-white/5 dark:text-slate-400">
-                    {t.exam.emptyConcepts}
+                    暂时还没有概念卡片。
                   </div>
                 )}
               </div>
@@ -233,7 +235,7 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
                   ))
                 ) : (
                   <div className="rounded-[28px] border border-dashed border-slate-300 bg-white/70 p-8 text-slate-500 dark:border-white/12 dark:bg-white/5 dark:text-slate-400">
-                    {t.exam.emptyPractice}
+                    暂时还没有练习题。
                   </div>
                 )}
               </div>
@@ -245,7 +247,7 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
                   <SummarySection content={content.tips} />
                 ) : (
                   <div className="rounded-[28px] border border-dashed border-slate-300 bg-white/70 p-8 text-slate-500 dark:border-white/12 dark:bg-white/5 dark:text-slate-400">
-                    {t.exam.emptyTips}
+                    暂时还没有复习提示。
                   </div>
                 )}
               </div>
@@ -255,10 +257,10 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
           <aside className="space-y-5">
             <div className="subject-panel rounded-[28px] border border-white/60 bg-slate-950 p-6 text-white shadow-[0_24px_60px_rgba(8,15,35,0.2)] dark:border-white/10">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/75">
-                {t.exam.studyFlowLabel}
+                复习流程
               </p>
               <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-                {t.exam.studyFlowTitle}
+                这门课怎么复习更顺手
               </h2>
               <div className="mt-6 space-y-4">
                 {sideNotes.map((note, index) => (
@@ -274,7 +276,7 @@ export default function SubjectContent({ contentEn, contentZh }: Props) {
 
             <div className="subject-panel rounded-[28px] border border-white/60 bg-white/78 p-6 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/60">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                {t.exam.coverageLabel}
+                覆盖度
               </p>
               <div className="mt-5 space-y-4">
                 {tabs.map((item) => {

@@ -39,11 +39,12 @@ export function getSubjects(): Subject[] {
 }
 
 export function getSubject(id: string): Subject | undefined {
-  return getSubjects().find((s) => s.id === id);
+  return getSubjects().find((subject) => subject.id === id);
 }
 
 function readJsonSafe(filePath: string): any[] {
   if (!fs.existsSync(filePath)) return [];
+
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
   } catch {
@@ -51,12 +52,12 @@ function readJsonSafe(filePath: string): any[] {
   }
 }
 
-function readMdSafe(filePath: string): string {
+function readMdSafe(filePath: string) {
   if (!fs.existsSync(filePath)) return "";
   return fs.readFileSync(filePath, "utf-8");
 }
 
-export function getSubjectContent(subjectId: string, lang: "en" | "zh"): SubjectContent | null {
+export function getSubjectContent(subjectId: string): SubjectContent | null {
   const subject = getSubject(subjectId);
   if (!subject) return null;
 
@@ -64,9 +65,9 @@ export function getSubjectContent(subjectId: string, lang: "en" | "zh"): Subject
 
   return {
     subject,
-    summary: readMdSafe(path.join(dir, `summary.${lang}.md`)),
-    concepts: readJsonSafe(path.join(dir, `concepts.${lang}.json`)),
-    practice: readJsonSafe(path.join(dir, `practice.${lang}.json`)),
-    tips: readMdSafe(path.join(dir, `tips.${lang}.md`)),
+    summary: readMdSafe(path.join(dir, "summary.md")),
+    concepts: readJsonSafe(path.join(dir, "concepts.json")),
+    practice: readJsonSafe(path.join(dir, "practice.json")),
+    tips: readMdSafe(path.join(dir, "tips.md")),
   };
 }

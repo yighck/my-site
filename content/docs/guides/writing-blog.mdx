@@ -11,13 +11,13 @@ tags: ["guides", "blog"]
 
 博客文章存放在 `content/blog/` 目录下，命名格式为：
 
-```
-{slug}.{lang}.mdx
+```text
+{slug}.mdx
 ```
 
 示例：
-- `my-first-post.en.mdx`（英文）
-- `my-first-post.zh.mdx`（中文）
+
+- `my-first-post.mdx`
 
 `{slug}` 将成为 URL 路径：`/blog/my-first-post`
 
@@ -43,7 +43,7 @@ tags: ["react", "nextjs", "tutorial"]
 
 ## 编写内容
 
-frontmatter 之后，使用标准 Markdown 编写，可选使用 JSX：
+frontmatter 之后，使用标准 Markdown 编写，可选使用 JSX。
 
 ### 代码块
 
@@ -74,6 +74,6 @@ function Hello() {
 | 单元格 1 | 单元格 2 |
 ```
 
-## 双语文章
+## 单语内容
 
-请为每篇文章同时创建 `.en.mdx` 和 `.zh.mdx` 文件。导航栏中的语言切换按钮会在两者之间切换。
+本站现在只保留中文内容。新文章只需要创建一个 `.mdx` 文件即可。

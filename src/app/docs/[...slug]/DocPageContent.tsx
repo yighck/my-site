@@ -8,7 +8,6 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
 import TableOfContents from "@/components/TableOfContents";
-import { useTranslation } from "@/i18n/LanguageContext";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxComponents } from "@/components/MdxComponents";
 import type { ContentItem, DocTreeNode, SearchItem } from "@/lib/content";
@@ -16,23 +15,12 @@ import type { ContentItem, DocTreeNode, SearchItem } from "@/lib/content";
 gsap.registerPlugin(useGSAP);
 
 interface Props {
-  pageEn: ContentItem;
-  pageZh: ContentItem | null;
-  treeEn: DocTreeNode[];
-  treeZh: DocTreeNode[];
+  page: ContentItem;
+  tree: DocTreeNode[];
   searchItems: SearchItem[];
 }
 
-export default function DocPageContent({
-  pageEn,
-  pageZh,
-  treeEn,
-  treeZh,
-  searchItems,
-}: Props) {
-  const { lang, t } = useTranslation();
-  const page = lang === "zh" && pageZh ? pageZh : pageEn;
-  const tree = lang === "zh" ? treeZh : treeEn;
+export default function DocPageContent({ page, tree, searchItems }: Props) {
   const scope = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -78,7 +66,7 @@ export default function DocPageContent({
               className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-4 py-2 text-sm text-slate-500 backdrop-blur transition-colors hover:text-slate-950 dark:border-white/10 dark:bg-white/6 dark:text-slate-300 dark:hover:text-white"
             >
               <span>{"<"}</span>
-              <span>{t.docs.backToDocs}</span>
+              <span>返回文档</span>
             </Link>
             <h1 className="mt-6 text-[clamp(2.2rem,4vw,3.8rem)] font-semibold tracking-tight text-slate-950 dark:text-white">
               {page.frontmatter.title}

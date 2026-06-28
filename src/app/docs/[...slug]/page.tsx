@@ -7,28 +7,18 @@ interface Props {
 }
 
 export function generateStaticParams() {
-  const pagesEn = getSearchIndex("en").filter((i) => i.type === "docs");
-  return pagesEn.map((p) => ({ slug: p.slug.replace("docs/", "").split("/") }));
+  return getSearchIndex()
+    .filter((item) => item.type === "docs")
+    .map((item) => ({ slug: item.slug.split("/") }));
 }
 
 export default async function DocPage({ params }: Props) {
   const { slug } = await params;
-  const pageEn = getDocPage(slug, "en");
-  const pageZh = getDocPage(slug, "zh");
-  if (!pageEn) notFound();
+  const page = getDocPage(slug);
+  if (!page) notFound();
 
-  const treeEn = getDocTree("en");
-  const treeZh = getDocTree("zh");
-  const searchItemsEn = getSearchIndex("en");
-  const searchItemsZh = getSearchIndex("zh");
+  const tree = getDocTree();
+  const searchItems = getSearchIndex();
 
-  return (
-    <DocPageContent
-      pageEn={pageEn}
-      pageZh={pageZh}
-      treeEn={treeEn}
-      treeZh={treeZh}
-      searchItems={[...searchItemsEn, ...searchItemsZh]}
-    />
-  );
+  return <DocPageContent page={page} tree={tree} searchItems={searchItems} />;
 }

@@ -1,29 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslation } from "@/i18n/LanguageContext";
 import type { Frontmatter } from "@/lib/content";
 
 interface Props {
   slug: string;
   frontmatter: Frontmatter;
-  lang: string;
 }
 
-export default function PostCard({ slug, frontmatter, lang }: Props) {
-  const { t } = useTranslation();
-
+export default function PostCard({ slug, frontmatter }: Props) {
   return (
     <Link
       href={`/blog/${slug}`}
       className="group block rounded-[28px] border border-white/60 bg-white/82 p-6 shadow-[0_22px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-colors hover:border-sky-200 dark:border-white/10 dark:bg-slate-950/62 dark:hover:border-cyan-400/30"
     >
       <div className="flex items-center justify-between gap-3">
-        <time className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400" dateTime={frontmatter.date}>
+        <time
+          className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+          dateTime={frontmatter.date}
+        >
           {frontmatter.date}
         </time>
         <span className="rounded-full bg-slate-950 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white dark:bg-cyan-300 dark:text-slate-950">
-          {t.postCard.typeLabel}
+          文章
         </span>
       </div>
 
@@ -48,7 +47,7 @@ export default function PostCard({ slug, frontmatter, lang }: Props) {
       )}
 
       <span className="mt-7 inline-flex text-sm font-medium text-sky-600 transition-transform group-hover:translate-x-1 dark:text-cyan-300">
-        {t.postCard.readMore}
+        继续阅读 {"->"}
       </span>
     </Link>
   );

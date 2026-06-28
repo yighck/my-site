@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { useTranslation } from "@/i18n/LanguageContext";
 
 gsap.registerPlugin(useGSAP);
 
@@ -22,7 +21,6 @@ export default function PracticeQuiz({
   answer,
   explanation,
 }: Props) {
-  const { t } = useTranslation();
   const [selected, setSelected] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const scope = useRef<HTMLDivElement>(null);
@@ -76,17 +74,17 @@ export default function PracticeQuiz({
     <div ref={scope} className="quiz-shell rounded-[30px] border border-white/60 bg-white/82 p-6 shadow-[0_22px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/62">
       <div className="flex items-center justify-between gap-3">
         <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white dark:bg-cyan-300 dark:text-slate-950">
-          {t.exam.questionLabel.replace("{number}", String(index + 1))}
+          第 {index + 1} 题
         </span>
         {hasAnswered && (
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-            isCorrect
-              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/14 dark:text-emerald-300"
-              : "bg-rose-100 text-rose-700 dark:bg-rose-500/14 dark:text-rose-300"
-          }`}>
-            {isCorrect
-              ? t.exam.quizCorrect
-              : t.exam.quizRetry}
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              isCorrect
+                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/14 dark:text-emerald-300"
+                : "bg-rose-100 text-rose-700 dark:bg-rose-500/14 dark:text-rose-300"
+            }`}
+          >
+            {isCorrect ? "回答正确" : "再看一遍"}
           </span>
         )}
       </div>
@@ -136,7 +134,7 @@ export default function PracticeQuiz({
             onClick={() => setShowExplanation((prev) => !prev)}
             className="text-sm font-semibold text-sky-600 transition-colors hover:text-sky-700 dark:text-cyan-300 dark:hover:text-cyan-200"
           >
-            {showExplanation ? t.exam.hideExplanation : t.exam.showExplanation}
+            {showExplanation ? "收起解析" : "查看解析"}
           </button>
 
           <div ref={explanationRef} className="overflow-hidden">

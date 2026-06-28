@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getSubjects } from "@/lib/exam";
@@ -7,12 +6,11 @@ import ExamReviewContent from "./ExamReviewContent";
 
 export default function ExamReviewPage() {
   const subjects = getSubjects();
-  const searchItemsEn = getSearchIndex("en");
-  const searchItemsZh = getSearchIndex("zh");
+  const searchItems = getSearchIndex();
 
   return (
     <>
-      <Header searchItems={[...searchItemsEn, ...searchItemsZh]} />
+      <Header searchItems={searchItems} />
       <ExamReviewContent subjects={subjects} />
       <Footer />
     </>

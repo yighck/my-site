@@ -7,24 +7,15 @@ interface Props {
 }
 
 export function generateStaticParams() {
-  const postsEn = getBlogPosts("en");
-  return postsEn.map((post) => ({ slug: post.slug }));
+  return getBlogPosts().map((post) => ({ slug: post.slug }));
 }
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const postEn = getBlogPost(slug, "en");
-  const postZh = getBlogPost(slug, "zh");
-  if (!postEn) notFound();
+  const post = getBlogPost(slug);
+  if (!post) notFound();
 
-  const searchItemsEn = getSearchIndex("en");
-  const searchItemsZh = getSearchIndex("zh");
+  const searchItems = getSearchIndex();
 
-  return (
-    <BlogPostContent
-      postEn={postEn}
-      postZh={postZh}
-      searchItems={[...searchItemsEn, ...searchItemsZh]}
-    />
-  );
+  return <BlogPostContent post={post} searchItems={searchItems} />;
 }

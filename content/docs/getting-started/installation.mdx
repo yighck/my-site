@@ -37,15 +37,15 @@ npm run dev
 
 ## 项目结构
 
-```
-content/           ← MDX 内容文件
-  blog/            ← 博客文章 (*.en.mdx, *.zh.mdx)
-  docs/            ← 文档页面
+```text
+content/           <- MDX 内容文件
+  blog/            <- 博客文章
+  docs/            <- 文档页面
+  exam-review/     <- 期末复习内容
 src/
-  app/             ← Next.js App Router 页面
-  components/      ← React 组件
-  lib/             ← 工具函数
-  i18n/            ← 翻译文件
+  app/             <- Next.js App Router 页面
+  components/      <- React 组件
+  lib/             <- 工具函数
 ```
 
 ## 编写内容
@@ -54,12 +54,10 @@ src/
 
 ```bash
 # 新博客文章
-content/blog/my-post.en.mdx
-content/blog/my-post.zh.mdx
+content/blog/my-post.mdx
 
 # 新文档页面
-content/docs/guides/my-guide.en.mdx
-content/docs/guides/my-guide.zh.mdx
+content/docs/guides/my-guide.mdx
 ```
 
 每个文件需要在顶部包含 frontmatter：

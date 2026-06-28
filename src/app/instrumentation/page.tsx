@@ -4,12 +4,11 @@ import { getSearchIndex } from "@/lib/content";
 import InstrumentationContent from "./InstrumentationContent";
 
 export default function InstrumentationPage() {
-  const searchItemsEn = getSearchIndex("en");
-  const searchItemsZh = getSearchIndex("zh");
+  const searchItems = getSearchIndex();
 
   return (
     <>
-      <Header searchItems={[...searchItemsEn, ...searchItemsZh]} />
+      <Header searchItems={searchItems} />
       <InstrumentationContent />
       <Footer />
     </>

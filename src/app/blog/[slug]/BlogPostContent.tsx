@@ -4,21 +4,16 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TableOfContents from "@/components/TableOfContents";
-import { useTranslation } from "@/i18n/LanguageContext";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxComponents } from "@/components/MdxComponents";
 import type { ContentItem, SearchItem } from "@/lib/content";
 
 interface Props {
-  postEn: ContentItem;
-  postZh: ContentItem | null;
+  post: ContentItem;
   searchItems: SearchItem[];
 }
 
-export default function BlogPostContent({ postEn, postZh, searchItems }: Props) {
-  const { lang, t } = useTranslation();
-  const post = lang === "zh" && postZh ? postZh : postEn;
-
+export default function BlogPostContent({ post, searchItems }: Props) {
   return (
     <>
       <Header searchItems={searchItems} />
@@ -29,7 +24,7 @@ export default function BlogPostContent({ postEn, postZh, searchItems }: Props) 
             className="mb-8 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-4 py-2 text-sm text-slate-500 backdrop-blur transition-colors hover:text-slate-950 dark:border-white/10 dark:bg-white/6 dark:text-slate-300 dark:hover:text-white"
           >
             <span>{"<"}</span>
-            <span>{t.blog.backToBlog}</span>
+            <span>返回博客</span>
           </Link>
 
           <header className="rounded-[34px] border border-white/60 bg-white/78 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/68">

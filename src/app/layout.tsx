@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
-import { LanguageProvider } from "@/i18n/LanguageContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,9 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "My Blog - Personal Tech Notes and Knowledge Base",
-  description:
-    "Personal blog and knowledge base. Technical articles, project notes, and documentation.",
+  title: "我的知识站",
+  description: "个人博客、文档知识库、期末复习整理与电赛仪器仪表专题。",
 };
 
 export default function RootLayout({
@@ -27,13 +25,11 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <LanguageProvider>
-          <ThemeProvider>{children}</ThemeProvider>
-        </LanguageProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

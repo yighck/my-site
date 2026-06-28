@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { useTranslation } from "@/i18n/LanguageContext";
 import type { Subject } from "@/lib/exam";
 
 gsap.registerPlugin(useGSAP);
@@ -13,24 +12,21 @@ interface Props {
   subjects: Subject[];
 }
 
+const FEATURE_LABELS = ["知识总结", "概念卡片", "练习题", "复习提示"];
+const STUDY_STEPS = [
+  "先看知识总结，快速找回章节主线。",
+  "再用概念卡片补术语和关键定义。",
+  "最后刷题并用提示区收束错题。",
+];
+
 export default function ExamReviewContent({ subjects }: Props) {
-  const { lang, t } = useTranslation();
   const scope = useRef<HTMLElement>(null);
 
-  const featureLabels = [
-    t.exam.featureSummary,
-    t.exam.featureConcepts,
-    t.exam.featurePractice,
-    t.exam.featureTips,
-  ];
-
   const statCards = [
-    { value: `${subjects.length}`, label: t.exam.statSubjects },
-    { value: "4", label: t.exam.statModes },
-    { value: "1", label: t.exam.statWorkflow },
+    { value: `${subjects.length}`, label: "门课程已整理" },
+    { value: "4", label: "种复习模块并行推进" },
+    { value: "1", label: "条清晰的考前冲刺路径" },
   ];
-
-  const steps = [t.exam.step1, t.exam.step2, t.exam.step3];
 
   useGSAP(
     () => {
@@ -53,11 +49,7 @@ export default function ExamReviewContent({ subjects }: Props) {
 
           intro
             .from(".review-badge", { y: 18, autoAlpha: 0 })
-            .from(
-              ".review-title-line",
-              { yPercent: 30, autoAlpha: 0, stagger: 0.08 },
-              "<0.08",
-            )
+            .from(".review-title-line", { yPercent: 30, autoAlpha: 0, stagger: 0.08 }, "<0.08")
             .from(".review-copy", { y: 22, autoAlpha: 0 }, "-=0.42")
             .from(".review-feature", { y: 18, autoAlpha: 0, stagger: 0.06 }, "-=0.38")
             .from(".review-stat", { y: 24, autoAlpha: 0, stagger: 0.08 }, "-=0.34")
@@ -92,22 +84,22 @@ export default function ExamReviewContent({ subjects }: Props) {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_22rem] lg:items-start">
           <div className="rounded-[32px] border border-white/60 bg-white/78 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/68">
             <span className="review-badge inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700 dark:border-cyan-500/20 dark:bg-cyan-500/10 dark:text-cyan-200">
-              {t.exam.badge}
+              期末冲刺
             </span>
 
             <div className="mt-6 space-y-2 text-[clamp(2.5rem,5vw,4.8rem)] font-semibold tracking-tight text-slate-950 dark:text-white">
-              <div className="review-title-line">{t.exam.heroLine1}</div>
+              <div className="review-title-line">把期末复习</div>
               <div className="review-title-line bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 bg-clip-text text-transparent">
-                {t.exam.heroLine2}
+                做成一张作战地图
               </div>
             </div>
 
             <p className="review-copy mt-6 max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-300">
-              {t.exam.heroCopy}
+              这块前端现在围绕课程冲刺来设计：先抓住知识框架，再翻概念、刷题、看提示，让复习节奏更像一套真的考前流程。
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              {featureLabels.map((feature) => (
+              {FEATURE_LABELS.map((feature) => (
                 <span
                   key={feature}
                   className="review-feature rounded-full border border-slate-200/80 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-white/6 dark:text-slate-200"
@@ -136,13 +128,13 @@ export default function ExamReviewContent({ subjects }: Props) {
 
           <aside className="subject-card rounded-[28px] border border-white/60 bg-slate-950 p-6 text-white shadow-[0_24px_80px_rgba(8,15,35,0.22)] dark:border-white/10">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/80">
-              {t.exam.studyRhythmLabel}
+              复习节奏
             </p>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight">
-              {t.exam.studyRhythmTitle}
+              一眼看到今天该复习什么
             </h2>
             <div className="mt-6 space-y-4">
-              {steps.map((step, index) => (
+              {STUDY_STEPS.map((step, index) => (
                 <div key={step} className="flex gap-4 rounded-2xl bg-white/6 p-4">
                   <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-cyan-300 text-sm font-semibold text-slate-950">
                     {index + 1}
@@ -158,10 +150,10 @@ export default function ExamReviewContent({ subjects }: Props) {
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                {t.exam.subjectsLabel}
+                科目列表
               </p>
               <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">
-                {t.exam.subjectsTitle}
+                按科目进入你的复习面板
               </h2>
             </div>
           </div>
@@ -186,20 +178,20 @@ export default function ExamReviewContent({ subjects }: Props) {
                         0{index + 1}
                       </p>
                       <h3 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">
-                        {lang === "zh" ? subject.name.zh : subject.name.en}
+                        {subject.name.zh}
                       </h3>
                     </div>
                     <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white dark:bg-cyan-300 dark:text-slate-950">
-                      {t.exam.ready}
+                      复习中
                     </span>
                   </div>
 
                   <p className="mt-5 max-w-lg text-sm leading-7 text-slate-600 dark:text-slate-300">
-                    {lang === "zh" ? subject.description.zh : subject.description.en}
+                    {subject.description.zh}
                   </p>
 
                   <div className="mt-6 flex flex-wrap gap-2">
-                    {featureLabels.map((feature) => (
+                    {FEATURE_LABELS.map((feature) => (
                       <span
                         key={`${subject.id}-${feature}`}
                         className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-white/8 dark:text-slate-300"
@@ -210,11 +202,9 @@ export default function ExamReviewContent({ subjects }: Props) {
                   </div>
 
                   <div className="mt-8 flex items-center justify-between text-sm font-medium">
-                    <span className="text-slate-400">
-                      {t.exam.openSubject}
-                    </span>
+                    <span className="text-slate-400">进入科目详情</span>
                     <span className="text-sky-600 transition-transform group-hover:translate-x-1 dark:text-cyan-300">
-                      {t.exam.startReviewing}
+                      开始复习 {"->"}
                     </span>
                   </div>
                 </div>

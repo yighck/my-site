@@ -7,20 +7,16 @@ import { useGSAP } from "@gsap/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Sidebar from "@/components/Sidebar";
-import { useTranslation } from "@/i18n/LanguageContext";
 import type { DocTreeNode, SearchItem } from "@/lib/content";
 
 gsap.registerPlugin(useGSAP);
 
 interface Props {
-  treeEn: DocTreeNode[];
-  treeZh: DocTreeNode[];
+  tree: DocTreeNode[];
   searchItems: SearchItem[];
 }
 
-export default function DocsContent({ treeEn, treeZh, searchItems }: Props) {
-  const { t, lang } = useTranslation();
-  const tree = lang === "zh" ? treeZh : treeEn;
+export default function DocsContent({ tree, searchItems }: Props) {
   const scope = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -61,13 +57,13 @@ export default function DocsContent({ treeEn, treeZh, searchItems }: Props) {
         <main className="min-w-0 flex-1">
           <section className="docs-hero rounded-[34px] border border-white/60 bg-white/78 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/68">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-              {t.docs.sectionLabel}
+              文档中心
             </p>
             <h1 className="mt-3 text-[clamp(2.4rem,4.5vw,4.2rem)] font-semibold tracking-tight text-slate-950 dark:text-white">
-              {t.docs.title}
+              文档
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-300">
-              {t.docs.subtitle}
+              指南、参考资料与知识库。
             </p>
           </section>
 
@@ -79,7 +75,7 @@ export default function DocsContent({ treeEn, treeZh, searchItems }: Props) {
                     {group.title}
                   </h2>
                   <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                    {group.children?.length ?? 1} {t.docs.pagesUnit}
+                    {group.children?.length ?? 1} 页
                   </span>
                 </div>
 
@@ -91,7 +87,7 @@ export default function DocsContent({ treeEn, treeZh, searchItems }: Props) {
                       className="group rounded-[28px] border border-white/60 bg-white/78 p-6 shadow-[0_22px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-colors hover:border-sky-200 dark:border-white/10 dark:bg-slate-950/62 dark:hover:border-cyan-400/30"
                     >
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                        {t.docs.pageLabel}
+                        文档页面
                       </p>
                       <h3 className="mt-3 text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
                         {page.title}
@@ -100,7 +96,7 @@ export default function DocsContent({ treeEn, treeZh, searchItems }: Props) {
                         /docs/{page.slug}
                       </p>
                       <span className="mt-6 inline-flex text-sm font-medium text-sky-600 transition-transform group-hover:translate-x-1 dark:text-cyan-300">
-                        {t.docs.continueReading}
+                        继续阅读 {"->"}
                       </span>
                     </Link>
                   ))}

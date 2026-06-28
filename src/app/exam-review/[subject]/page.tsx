@@ -10,22 +10,20 @@ interface Props {
 }
 
 export function generateStaticParams() {
-  return getSubjects().map((s) => ({ subject: s.id }));
+  return getSubjects().map((subject) => ({ subject: subject.id }));
 }
 
 export default async function SubjectPage({ params }: Props) {
   const { subject } = await params;
-  const contentEn = getSubjectContent(subject, "en");
-  const contentZh = getSubjectContent(subject, "zh");
-  if (!contentEn && !contentZh) notFound();
+  const content = getSubjectContent(subject);
+  if (!content) notFound();
 
-  const searchItemsEn = getSearchIndex("en");
-  const searchItemsZh = getSearchIndex("zh");
+  const searchItems = getSearchIndex();
 
   return (
     <>
-      <Header searchItems={[...searchItemsEn, ...searchItemsZh]} />
-      <SubjectContent contentEn={contentEn} contentZh={contentZh} />
+      <Header searchItems={searchItems} />
+      <SubjectContent content={content} />
       <Footer />
     </>
   );

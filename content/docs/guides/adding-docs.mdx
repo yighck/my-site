@@ -11,18 +11,14 @@ tags: ["guides", "docs"]
 
 文档存放在 `content/docs/` 目录下，可以组织为子目录：
 
-```
+```text
 content/docs/
   getting-started/
-    introduction.en.mdx
-    introduction.zh.mdx
-    installation.en.mdx
-    installation.zh.mdx
+    introduction.mdx
+    installation.mdx
   guides/
-    writing-blog.en.mdx
-    writing-blog.zh.mdx
-    adding-docs.en.mdx
-    adding-docs.zh.mdx
+    writing-blog.mdx
+    adding-docs.mdx
 ```
 
 子目录在侧边栏导航中显示为**分组**。
@@ -31,12 +27,13 @@ content/docs/
 
 与博客文章相同的格式：
 
-```
-{slug}.{lang}.mdx
+```text
+{slug}.mdx
 ```
 
 URL 路径镜像目录结构：
-- `content/docs/getting-started/installation.en.mdx` → `/docs/getting-started/installation`
+
+- `content/docs/getting-started/installation.mdx` -> `/docs/getting-started/installation`
 
 ## Frontmatter
 
@@ -59,10 +56,10 @@ tags: ["可选", "标签"]
 
 要控制页面顺序，可以使用数字前缀命名文件：
 
-```
-01-introduction.en.mdx
-02-installation.en.mdx
-03-configuration.en.mdx
+```text
+01-introduction.mdx
+02-installation.mdx
+03-configuration.mdx
 ```
 
 ## 编写技巧
@@ -92,7 +89,7 @@ export default function Page() {
 带粗体前缀的引用块适合做提示：
 
 > **注意：** 这是读者应该关注的重要提示。
-
+>
 > **警告：** 修改此配置时请谨慎操作。
 
 ### 页面间互相引用
@@ -103,6 +100,6 @@ export default function Page() {
 请参阅[安装指南](/docs/getting-started/installation)了解搭建步骤。
 ```
 
-## 双语内容
+## 单语内容
 
-请同时创建 `.en.mdx` 和 `.zh.mdx` 文件。语言切换按钮会在两者之间切换。
+本站现在只保留中文内容。新增文档时只需要创建一个 `.mdx` 文件。

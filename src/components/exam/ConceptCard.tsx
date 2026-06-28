@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { useTranslation } from "@/i18n/LanguageContext";
 
 gsap.registerPlugin(useGSAP);
 
@@ -14,7 +13,6 @@ interface Props {
 }
 
 export default function ConceptCard({ term, en, definition }: Props) {
-  const { t } = useTranslation();
   const [flipped, setFlipped] = useState(false);
   const scope = useRef<HTMLButtonElement>(null);
 
@@ -40,7 +38,7 @@ export default function ConceptCard({ term, en, definition }: Props) {
         <div className="absolute inset-0 flex h-full flex-col justify-between rounded-[28px] p-6 [backface-visibility:hidden]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-              {t.exam.conceptLabel}
+              概念卡
             </p>
             <h3 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white">
               {term}
@@ -51,10 +49,10 @@ export default function ConceptCard({ term, en, definition }: Props) {
           </div>
           <div className="flex items-end justify-between">
             <p className="max-w-[13rem] text-sm leading-7 text-slate-500 dark:text-slate-400">
-              {t.exam.conceptHint}
+              点击翻到背面，查看定义和要点。
             </p>
             <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white dark:bg-cyan-300 dark:text-slate-950">
-              {flipped ? t.exam.conceptBack : t.exam.conceptFront}
+              {flipped ? "背面" : "正面"}
             </span>
           </div>
         </div>
@@ -63,14 +61,14 @@ export default function ConceptCard({ term, en, definition }: Props) {
           <div className="flex h-full w-full flex-col justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80 dark:text-slate-700">
-                {t.exam.definitionLabel}
+                定义
               </p>
               <p className="mt-5 text-sm leading-8 text-slate-100 dark:text-slate-900">
                 {definition}
               </p>
             </div>
             <span className="text-xs font-medium uppercase tracking-[0.18em] text-slate-300 dark:text-slate-700">
-              {t.exam.conceptReturn}
+              再次点击返回
             </span>
           </div>
         </div>

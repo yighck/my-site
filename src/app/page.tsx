@@ -4,17 +4,14 @@ import HomeContent from "./HomeContent";
 import { getBlogPosts, getSearchIndex } from "@/lib/content";
 
 export default function Home() {
-  const searchItemsEn = getSearchIndex("en");
-  const searchItemsZh = getSearchIndex("zh");
-  const searchItems = [...searchItemsEn, ...searchItemsZh];
-  const postsEn = getBlogPosts("en").slice(0, 3);
-  const postsZh = getBlogPosts("zh").slice(0, 3);
+  const searchItems = getSearchIndex();
+  const posts = getBlogPosts().slice(0, 3);
 
   return (
     <>
       <Header searchItems={searchItems} />
       <main className="mx-auto max-w-6xl flex-1 px-6 py-16">
-        <HomeContent postsEn={postsEn} postsZh={postsZh} />
+        <HomeContent posts={posts} />
       </main>
       <Footer />
     </>
