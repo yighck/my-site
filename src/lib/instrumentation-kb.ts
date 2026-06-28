@@ -5668,6 +5668,142 @@ function buildDataDrivenVerification(
   ]).slice(0, 8);
 }
 
+function buildDirectChineseModules(
+  selected: InstrumentationProfile,
+  supportProfiles: Array<{ profile: InstrumentationProfile }>,
+) {
+  const modules = selected.modules
+    .map((section) => ({
+      title: getText(section.title, "zh"),
+      items: dedupeStrings(section.items.map((item) => getText(item, "zh"))),
+    }))
+    .filter((section) => section.items.length);
+
+  for (const supportProfile of supportProfiles.slice(0, 2)) {
+    const supportItems = dedupeStrings(
+      (supportProfile.profile.modules[0]?.items ?? []).map((item) => getText(item, "zh")),
+    );
+    if (!supportItems.length) {
+      continue;
+    }
+    modules.push({
+      title: `辅助补充：${getText(supportProfile.profile.family, "zh")}`,
+      items: supportItems.slice(0, 4),
+    });
+  }
+
+  return modules;
+}
+
+function buildDirectChineseSummary(selected: InstrumentationProfile) {
+  return dedupeStrings([
+    getText(selected.summary, "zh"),
+    selected.references.length
+      ? `可优先参考 ${selected.references.slice(0, 2).join("、")}。`
+      : undefined,
+  ]).join(" ");
+}
+
+function buildDirectChineseReasoning(
+  selected: InstrumentationProfile,
+  modules: Array<{ title: string; items: string[] }>,
+  supportProfiles: Array<{ profile: InstrumentationProfile }>,
+) {
+  const supportFamilies = dedupeStrings(
+    supportProfiles.map((profile) => getText(profile.profile.family, "zh")),
+  );
+
+  return dedupeStrings([
+    `题面核心目标更接近“${getText(selected.family, "zh")}”这一类任务。`,
+    supportFamilies.length
+      ? `同时带有${supportFamilies.join("、")}的辅线特征，但更适合在主线跑通后再补充。`
+      : undefined,
+    modules[0]
+      ? `首个应落地的模块建议放在“${modules[0].title}”，这样更容易尽快形成可测闭环。`
+      : undefined,
+  ]).slice(0, 3);
+}
+
+function buildDirectChineseApproach(
+  selected: InstrumentationProfile,
+  modules: Array<{ title: string; items: string[] }>,
+  supportProfiles: Array<{ profile: InstrumentationProfile }>,
+) {
+  const moduleFlow = modules.slice(0, 3).map((module) => module.title);
+  const supportFamilies = dedupeStrings(
+    supportProfiles.map((profile) => getText(profile.profile.family, "zh")),
+  );
+
+  return dedupeStrings([
+    getText(selected.approach, "zh"),
+    moduleFlow.length
+      ? `推进顺序建议按“${moduleFlow.join(" -> ")}”展开，先把主闭环跑通，再逐步补齐扩展功能和展示链路。`
+      : undefined,
+    supportFamilies.length
+      ? `如果题面同时带有${supportFamilies.join("、")}的辅线要求，建议在主方案稳定后再吸收对应模块，不要一开始并行铺开。`
+      : undefined,
+    selected.references.length
+      ? `实现节奏可以参考 ${selected.references.slice(0, 2).join("、")} 的搭建和联调顺序。`
+      : undefined,
+  ]).join(" ");
+}
+
+function buildDirectChineseTuningSteps(
+  selected: InstrumentationProfile,
+  modules: Array<{ title: string; items: string[] }>,
+) {
+  return dedupeStrings([
+    modules[0]
+      ? `先单独打通“${modules[0].title}”，确认输入、处理和输出都能稳定复现。`
+      : undefined,
+    modules[1]
+      ? `再联调“${modules[1].title}”，观察主指标是否连续稳定。`
+      : undefined,
+    ...selected.tuningSteps.map((item) => getText(item, "zh")),
+  ]).slice(0, 8);
+}
+
+function buildDirectChineseRisks(selected: InstrumentationProfile) {
+  return dedupeStrings([
+    ...selected.risks.map((item) => getText(item, "zh")),
+    "联调阶段不要同时大改硬件和算法参数，避免问题定位发散。",
+  ]).slice(0, 8);
+}
+
+function buildDirectChineseVerification(selected: InstrumentationProfile) {
+  return dedupeStrings([
+    ...selected.verification.map((item) => getText(item, "zh")),
+    "最终验收前保留一套稳定参数和演示流程，避免现场来回回退。",
+  ]).slice(0, 8);
+}
+
+function buildDirectChinesePlan(
+  selected: InstrumentationProfile,
+  supportProfiles: Array<{ profile: InstrumentationProfile }>,
+): RecommendedPlan {
+  const modules = buildDirectChineseModules(selected, supportProfiles);
+  const supportFamilies = dedupeStrings(
+    supportProfiles.map((profile) => getText(profile.profile.family, "zh")),
+  );
+  const detectedFamily = supportFamilies.length
+    ? `${getText(selected.family, "zh")}，兼顾${supportFamilies.join("、")}`
+    : getText(selected.family, "zh");
+
+  return {
+    title: getText(selected.title, "zh"),
+    summary: buildDirectChineseSummary(selected),
+    approach: buildDirectChineseApproach(selected, modules, supportProfiles),
+    modules,
+    tuningSteps: buildDirectChineseTuningSteps(selected, modules),
+    risks: buildDirectChineseRisks(selected),
+    verification: buildDirectChineseVerification(selected),
+    references: selected.references,
+    detectedFamily,
+    matchedTerms: [],
+    reasoning: buildDirectChineseReasoning(selected, modules, supportProfiles),
+  };
+}
+
 function buildBoostedTerms(profileId: string, normalizedText: string) {
   const playbook = instrumentationFamilyPlaybooks.find((item) => item.profileId === profileId);
   if (!playbook) {
@@ -6295,6 +6431,11 @@ export function recommendPlanFromDistilledDataRich(
   const routeVariants = getRankedRouteVariants(selected.id, normalizedText, lang);
   const topRoute = getTopRouteVariant(routeVariants);
   const routeFocusModule = buildRouteFocusModule(topRoute, lang);
+
+  if (lang === "zh") {
+    return buildDirectChinesePlan(selected, supportProfiles);
+  }
+
   const crossFamilyModules = supportProfiles
     .map((profile) => buildCrossFamilyModule(selected.id, profile, lang))
     .filter((module): module is { title: string; items: string[] } => Boolean(module));
@@ -6347,7 +6488,7 @@ export function recommendPlanFromDistilledDataRich(
 
   if (familyPlaybook) {
     modules.push({
-      title: lang === "zh" ? "蒸馏主线" : "Distilled Backbone",
+      title: "Distilled Backbone",
       items: familyPlaybook.winningBackbone,
     });
   }
@@ -6358,10 +6499,7 @@ export function recommendPlanFromDistilledDataRich(
 
   for (const supportProfile of supportProfiles) {
     modules.push({
-      title:
-        lang === "zh"
-          ? `次级题型补充：${getText(supportProfile.profile.family, lang)}`
-          : `Secondary family add-on: ${getText(supportProfile.profile.family, lang)}`,
+      title: `Secondary family add-on: ${getText(supportProfile.profile.family, lang)}`,
       items: supportProfile.profile.modules[0]
         ? supportProfile.profile.modules[0].items.map((item) => getText(item, lang))
         : [],
@@ -6385,26 +6523,15 @@ export function recommendPlanFromDistilledDataRich(
     ? [getText(selected.family, lang), ...supportProfiles.map((profile) => getText(profile.profile.family, lang))].join(" + ")
     : getText(selected.family, lang);
 
-  const summaryParts =
-    lang === "zh"
-      ? [
-          getText(selected.summary, lang),
-          matchedTerms.length > 0 ? `题面命中的关键词：${matchedTerms.slice(0, 8).join("、")}。` : "",
-          topRoute ? `优先落地路线：${topRoute.name}。` : "",
-          relatedProblems.length > 0
-            ? `最接近的历年题有：${relatedProblems.map((item) => `${item.code} ${item.title}`).join("；")}。`
-            : `参考蒸馏题：${selected.references.join("；")}。`,
-          familyPlaybook?.headline ? `题型蒸馏主线：${familyPlaybook.headline}` : "",
-        ]
-      : [
-          getText(selected.summary, lang),
-          matchedTerms.length > 0 ? `Matched cues: ${matchedTerms.slice(0, 8).join(", ")}.` : "",
-          topRoute ? `Preferred route: ${topRoute.name}.` : "",
-          relatedProblems.length > 0
-            ? `Closest historical matches: ${relatedProblems.map((item) => `${item.code} ${item.title}`).join("; ")}.`
-            : `Reference problems: ${selected.references.join("; ")}.`,
-          familyPlaybook?.headline ? `Distilled backbone: ${familyPlaybook.headline}` : "",
-        ];
+  const summaryParts = [
+    getText(selected.summary, lang),
+    matchedTerms.length > 0 ? `Matched cues: ${matchedTerms.slice(0, 8).join(", ")}.` : "",
+    topRoute ? `Preferred route: ${topRoute.name}.` : "",
+    relatedProblems.length > 0
+      ? `Closest historical matches: ${relatedProblems.map((item) => `${item.code} ${item.title}`).join("; ")}.`
+      : `Reference problems: ${selected.references.join("; ")}.`,
+    familyPlaybook?.headline ? `Distilled backbone: ${familyPlaybook.headline}` : "",
+  ];
 
   const plan: RecommendedPlan = {
     title: getText(selected.title, lang),
@@ -6469,7 +6596,7 @@ export function recommendPlanFromDistilledDataRich(
     routeVariants,
   };
 
-  return lang === "zh" ? forceZhDisplayValue(plan) : plan;
+  return plan;
 }
 
 export function recommendPlanFromDistilledData(
