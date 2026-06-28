@@ -3,7 +3,19 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { recommendPlanFromDistilledData } from "@/lib/instrumentation-kb";
 
-const OPENAI_API_URL = "https://api.openai.com/v1/responses";
+function normalizeOpenAiBaseUrl(baseUrl: string | undefined) {
+  const fallback = "https://api.openai.com/v1";
+  const raw = baseUrl?.trim();
+
+  if (!raw) {
+    return fallback;
+  }
+
+  return raw.replace(/\/+$/, "");
+}
+
+const OPENAI_BASE_URL = normalizeOpenAiBaseUrl(process.env.OPENAI_BASE_URL);
+const OPENAI_API_URL = `${OPENAI_BASE_URL}/responses`;
 const DEFAULT_OCR_MODEL = process.env.OPENAI_OCR_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini";
 const OCR_OUTPUT_TOKEN_LIMIT = 480;
 const OCR_TEXT_PRIORITY_THRESHOLD = 96;
@@ -312,8 +324,8 @@ export async function POST(request: NextRequest) {
       {
         error:
           lang === "zh"
-            ? "当前只上传图片时需要配置 OPENAI_API_KEY 用于识图。"
-            : "Image-only input requires OPENAI_API_KEY for OCR.",
+            ? "当前只上传图片时需要配置兼容 OpenAI 的 OCR 接口密钥，例如 OPENAI_API_KEY。"
+            : "Image-only input requires an OpenAI-compatible OCR API key such as OPENAI_API_KEY.",
       },
       { status: 500 },
     );
