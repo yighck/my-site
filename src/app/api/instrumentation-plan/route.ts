@@ -317,92 +317,105 @@ function simplifyPlan(plan: RecommendedPlan): SimplePlan {
 }
 
 export async function POST(request: NextRequest) {
-  const body = (await request.json()) as RequestBody;
-  const topic = body.topic?.trim();
-  const imageDataUrl = body.imageDataUrl?.trim();
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = DEFAULT_OCR_MODEL;
+  try {
+    const body = (await request.json()) as RequestBody;
+    const topic = body.topic?.trim();
+    const imageDataUrl = body.imageDataUrl?.trim();
+    const apiKey = process.env.OPENAI_API_KEY;
+    const model = DEFAULT_OCR_MODEL;
 
-  if (!topic && !imageDataUrl) {
+    if (!topic && !imageDataUrl) {
+      return NextResponse.json(
+        {
+          error: "请至少提供题目文字或题目图片。",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (imageDataUrl && !apiKey && !topic) {
+      return NextResponse.json(
+        {
+          error: "当前只有图片输入时，需要先配置 OCR 所需的 OPENAI_API_KEY。",
+        },
+        { status: 500 },
+      );
+    }
+
+    let mergedTopic = topic ?? "";
+    let budgetState = await readOcrBudgetState();
+    let ocrUsage: OcrUsage | undefined;
+    let ocrUsed = false;
+    let forcedTextOnly = false;
+
+    if (shouldRunImageOcr(topic, imageDataUrl, apiKey)) {
+      const remainingBudget = Math.max(0, budgetState.totalBudget - budgetState.totalUsed);
+
+      if (remainingBudget < OCR_REQUEST_TOKEN_RESERVE) {
+        forcedTextOnly = true;
+      } else {
+        try {
+          const extracted = await extractProblemTextFromImage(apiKey as string, imageDataUrl as string, model);
+          ocrUsage = extracted.usage;
+          ocrUsed = extracted.usage.totalTokens > 0 || extracted.text.trim().length > 0;
+
+          if (extracted.text.trim()) {
+            mergedTopic = mergedTopic
+              ? `${mergedTopic}\n\n${extracted.text.trim()}`
+              : extracted.text.trim();
+          }
+
+          if (extracted.usage.totalTokens > 0) {
+            budgetState = {
+              totalBudget: budgetState.totalBudget,
+              totalUsed: Math.min(
+                budgetState.totalBudget,
+                budgetState.totalUsed + extracted.usage.totalTokens,
+              ),
+              updatedAt: new Date().toISOString(),
+            };
+            await writeOcrBudgetState(budgetState);
+          }
+        } catch (error) {
+          if (!mergedTopic) {
+            return NextResponse.json(
+              {
+                error: error instanceof Error ? error.message : "题目图片识别失败，请稍后重试。",
+              },
+              { status: 502 },
+            );
+          }
+        }
+      }
+    }
+
+    if (!mergedTopic) {
+      return NextResponse.json(
+        {
+          error: forcedTextOnly
+            ? "当前 OCR 预算不足，请补充题目文字后再生成方案。"
+            : "未能从图片中提取有效题目文字，请补充文字说明后再试。",
+        },
+        { status: 400 },
+      );
+    }
+
+    const plan = simplifyPlan(recommendPlanFromDistilledData(mergedTopic, "zh"));
+    const meta: PlanResponseMeta = {
+      mode: ocrUsed ? "local-kb-plus-ocr" : "local-kb",
+      ocrUsed,
+      budgetNotice: buildBudgetNotice(budgetState, ocrUsage, forcedTextOnly),
+    };
+
+    return NextResponse.json({ plan, meta });
+  } catch (error) {
+    console.error("instrumentation-plan route error", error);
+
     return NextResponse.json(
       {
-        error: "请至少提供题目文字或题目图片。",
-      },
-      { status: 400 },
-    );
-  }
-
-  if (imageDataUrl && !apiKey && !topic) {
-    return NextResponse.json(
-      {
-        error: "当前只有图片输入时，需要先配置 OCR 所需的 OPENAI_API_KEY。",
+        error: error instanceof Error ? `服务端处理失败：${error.message}` : "服务端处理失败，请稍后重试。",
       },
       { status: 500 },
     );
   }
-
-  let mergedTopic = topic ?? "";
-  let budgetState = await readOcrBudgetState();
-  let ocrUsage: OcrUsage | undefined;
-  let ocrUsed = false;
-  let forcedTextOnly = false;
-
-  if (shouldRunImageOcr(topic, imageDataUrl, apiKey)) {
-    const remainingBudget = Math.max(0, budgetState.totalBudget - budgetState.totalUsed);
-
-    if (remainingBudget < OCR_REQUEST_TOKEN_RESERVE) {
-      forcedTextOnly = true;
-    } else {
-      try {
-        const extracted = await extractProblemTextFromImage(apiKey as string, imageDataUrl as string, model);
-        ocrUsage = extracted.usage;
-        ocrUsed = extracted.usage.totalTokens > 0 || extracted.text.trim().length > 0;
-
-        if (extracted.text.trim()) {
-          mergedTopic = mergedTopic ? `${mergedTopic}\n\n${extracted.text.trim()}` : extracted.text.trim();
-        }
-
-        if (extracted.usage.totalTokens > 0) {
-          budgetState = {
-            totalBudget: budgetState.totalBudget,
-            totalUsed: Math.min(
-              budgetState.totalBudget,
-              budgetState.totalUsed + extracted.usage.totalTokens,
-            ),
-            updatedAt: new Date().toISOString(),
-          };
-          await writeOcrBudgetState(budgetState);
-        }
-      } catch (error) {
-        if (!mergedTopic) {
-          return NextResponse.json(
-            {
-              error: error instanceof Error ? error.message : "题目图片识别失败，请稍后重试。",
-            },
-            { status: 502 },
-          );
-        }
-      }
-    }
-  }
-
-  if (!mergedTopic) {
-    return NextResponse.json(
-      {
-        error: forcedTextOnly
-          ? "当前 OCR 预算不足，请补充题目文字后再生成方案。"
-          : "未能从图片中提取有效题目文字，请补充文字说明后再试。",
-      },
-      { status: 400 },
-    );
-  }
-
-  const plan = simplifyPlan(recommendPlanFromDistilledData(mergedTopic, "zh"));
-  const meta: PlanResponseMeta = {
-    mode: ocrUsed ? "local-kb-plus-ocr" : "local-kb",
-    ocrUsed,
-    budgetNotice: buildBudgetNotice(budgetState, ocrUsage, forcedTextOnly),
-  };
-
-  return NextResponse.json({ plan, meta });
 }

@@ -66,6 +66,27 @@ export default function InstrumentationContent() {
     { scope },
   );
 
+  async function readInstrumentationResponse(response: Response) {
+    const contentType = response.headers.get("content-type") ?? "";
+    const rawText = await response.text();
+
+    if (contentType.includes("application/json")) {
+      try {
+        return JSON.parse(rawText) as InstrumentationResponse;
+      } catch {
+        throw new Error("接口返回了无效的 JSON 数据，请刷新页面后重试。");
+      }
+    }
+
+    const compactText = rawText.replace(/\s+/g, " ").trim();
+    const preview = compactText.slice(0, 120);
+    throw new Error(
+      preview
+        ? `接口没有返回 JSON，可能是服务端报错了：${preview}`
+        : "接口没有返回 JSON，可能是服务端报错了。",
+    );
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -92,7 +113,7 @@ export default function InstrumentationContent() {
         }),
       });
 
-      const data = (await response.json()) as InstrumentationResponse | undefined;
+      const data = await readInstrumentationResponse(response);
       if (!response.ok || !data?.plan) {
         throw new Error(data?.error || INSTRUMENTATION_COPY.requestFailed);
       }
