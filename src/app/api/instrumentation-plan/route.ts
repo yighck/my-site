@@ -1,7 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { recommendPlanFromDistilledData } from "@/lib/instrumentation-kb";
 
 const OPENAI_API_URL = "https://api.openai.com/v1/responses";
+const DEFAULT_OCR_MODEL = process.env.OPENAI_OCR_MODEL || process.env.OPENAI_MODEL || "gpt-4.1-mini";
+const OCR_OUTPUT_TOKEN_LIMIT = 480;
+const OCR_TEXT_PRIORITY_THRESHOLD = 96;
+const HARD_OCR_TOTAL_TOKEN_BUDGET_CAP = 10_000_000;
+const OCR_BUDGET_FILE = path.join(process.cwd(), "data", "instrumentation-ocr-budget.json");
+
+function parsePositiveIntegerEnv(value: string | undefined, fallback: number, cap?: number) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+
+  const normalized = Math.floor(parsed);
+  return typeof cap === "number" ? Math.min(normalized, cap) : normalized;
+}
+
+const OCR_TOTAL_TOKEN_BUDGET = parsePositiveIntegerEnv(
+  process.env.INSTRUMENTATION_OCR_TOKEN_BUDGET,
+  HARD_OCR_TOTAL_TOKEN_BUDGET_CAP,
+  HARD_OCR_TOTAL_TOKEN_BUDGET_CAP,
+);
+const OCR_REQUEST_TOKEN_RESERVE = parsePositiveIntegerEnv(
+  process.env.INSTRUMENTATION_OCR_REQUEST_RESERVE,
+  12_000,
+  OCR_TOTAL_TOKEN_BUDGET,
+);
+
+export const runtime = "nodejs";
 
 interface RequestBody {
   topic?: string;
@@ -9,20 +39,63 @@ interface RequestBody {
   imageDataUrl?: string;
 }
 
+interface OcrBudgetState {
+  totalBudget: number;
+  totalUsed: number;
+  updatedAt: string;
+}
+
+interface OcrUsage {
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+}
+
+interface OcrExtractionResult {
+  text: string;
+  usage: OcrUsage;
+}
+
+interface PlanResponseMeta {
+  mode: "local-kb" | "local-kb-plus-ocr";
+  ocrAttempted: boolean;
+  ocrUsed: boolean;
+  ocrBudget: {
+    totalBudget: number;
+    totalUsed: number;
+    remaining: number;
+    requestReserve: number;
+  };
+  ocrUsage?: OcrUsage;
+  budgetNotice?: string;
+}
+
+function shouldRunImageOcr(topic: string | undefined, imageDataUrl: string | undefined, apiKey?: string) {
+  if (!imageDataUrl || !apiKey) {
+    return false;
+  }
+
+  if (!topic) {
+    return true;
+  }
+
+  return topic.length < OCR_TEXT_PRIORITY_THRESHOLD;
+}
+
 function buildVisionPrompt(lang: "en" | "zh") {
   if (lang === "zh") {
     return [
-      "你现在只负责识别图片里的电赛题目文字，不负责生成方案。",
-      "请尽量完整提取题目中的目标、指标、限制条件、输入输出要求和判分要点。",
-      "如果图片里有表格、编号或分条要求，请保留结构。",
-      "不要编造缺失内容，不要给建议，只输出提取后的题目文字。",
+      "你只负责识别图片里的电赛题目文字，不负责生成方案。",
+      "尽量完整提取目标、指标、限制条件、输入输出要求和评分相关内容。",
+      "如果图片里有分条、编号或表格，请保留原有结构。",
+      "不要编造缺失内容，不要补建议，只输出提取后的题目文字。",
     ].join("\n");
   }
 
   return [
-    "You only extract the contest problem text from the image and do not generate a solution.",
-    "Preserve goals, metrics, constraints, input/output requirements, and scoring-relevant details as faithfully as possible.",
-    "If the image contains bullet points or numbered requirements, keep that structure.",
+    "Only extract the contest problem text from the image.",
+    "Preserve targets, metrics, constraints, inputs, outputs, and scoring-relevant details.",
+    "Keep bullets, numbering, and tables when visible.",
     "Do not invent missing content and do not add advice.",
   ].join("\n");
 }
@@ -67,12 +140,99 @@ function extractOutputText(data: unknown): string | null {
   return null;
 }
 
+function readUsageValue(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+}
+
+function extractUsage(data: unknown): OcrUsage {
+  if (!data || typeof data !== "object") {
+    return { inputTokens: 0, outputTokens: 0, totalTokens: 0 };
+  }
+
+  const usage = (data as { usage?: unknown }).usage;
+  if (!usage || typeof usage !== "object") {
+    return { inputTokens: 0, outputTokens: 0, totalTokens: 0 };
+  }
+
+  const inputTokens = readUsageValue((usage as { input_tokens?: unknown }).input_tokens);
+  const outputTokens = readUsageValue((usage as { output_tokens?: unknown }).output_tokens);
+  const totalTokens =
+    readUsageValue((usage as { total_tokens?: unknown }).total_tokens) || inputTokens + outputTokens;
+
+  return {
+    inputTokens,
+    outputTokens,
+    totalTokens,
+  };
+}
+
+async function ensureBudgetFile() {
+  await mkdir(path.dirname(OCR_BUDGET_FILE), { recursive: true });
+}
+
+async function readOcrBudgetState(): Promise<OcrBudgetState> {
+  try {
+    const content = await readFile(OCR_BUDGET_FILE, "utf8");
+    const parsed = JSON.parse(content) as Partial<OcrBudgetState>;
+    const parsedBudget =
+      typeof parsed.totalBudget === "number" && Number.isFinite(parsed.totalBudget)
+        ? parsed.totalBudget
+        : OCR_TOTAL_TOKEN_BUDGET;
+    const totalBudget = Math.min(parsedBudget, OCR_TOTAL_TOKEN_BUDGET);
+    const parsedUsed =
+      typeof parsed.totalUsed === "number" && Number.isFinite(parsed.totalUsed) ? parsed.totalUsed : 0;
+    const totalUsed = Math.min(Math.max(parsedUsed, 0), totalBudget);
+
+    return {
+      totalBudget,
+      totalUsed,
+      updatedAt: typeof parsed.updatedAt === "string" ? parsed.updatedAt : new Date(0).toISOString(),
+    };
+  } catch {
+    return {
+      totalBudget: OCR_TOTAL_TOKEN_BUDGET,
+      totalUsed: 0,
+      updatedAt: new Date(0).toISOString(),
+    };
+  }
+}
+
+async function writeOcrBudgetState(state: OcrBudgetState) {
+  await ensureBudgetFile();
+  await writeFile(OCR_BUDGET_FILE, JSON.stringify(state, null, 2), "utf8");
+}
+
+function buildBudgetNotice(
+  lang: "en" | "zh",
+  state: OcrBudgetState,
+  usage?: OcrUsage,
+  forcedTextOnly?: boolean,
+) {
+  const remaining = Math.max(0, state.totalBudget - state.totalUsed);
+
+  if (forcedTextOnly) {
+    return lang === "zh"
+      ? `OCR 总预算受 10M 以内硬上限约束，当前已自动切换为纯本地蒸馏推荐。剩余预算约 ${remaining} tokens。`
+      : `OCR is constrained by a hard under-10M global budget, so this request fell back to local distilled recommendation only. Remaining budget is about ${remaining} tokens.`;
+  }
+
+  if (!usage || usage.totalTokens <= 0) {
+    return lang === "zh"
+      ? `本次未走模型生成方案；文本题目直接使用本地蒸馏知识库。当前 OCR 预算仍受 10M 以内硬上限约束，剩余约 ${remaining} tokens。`
+      : `This request did not use model generation; text problems go straight through the local distilled knowledge base. OCR remains under a hard sub-10M global budget, with about ${remaining} tokens left.`;
+  }
+
+  return lang === "zh"
+    ? `本次仅在识图阶段消耗了 ${usage.totalTokens} tokens，方案推荐仍然完全来自本地蒸馏知识库。当前 OCR 总预算保持在 10M 以内，剩余约 ${remaining} tokens。`
+    : `This request used ${usage.totalTokens} tokens only for OCR. The recommendation still came entirely from the local distilled knowledge base, and total OCR usage remains under 10M. Remaining budget is about ${remaining} tokens.`;
+}
+
 async function extractProblemTextFromImage(
   apiKey: string,
   imageDataUrl: string,
   lang: "en" | "zh",
   model: string,
-) {
+): Promise<OcrExtractionResult> {
   const response = await fetch(OPENAI_API_URL, {
     method: "POST",
     headers: {
@@ -81,6 +241,8 @@ async function extractProblemTextFromImage(
     },
     body: JSON.stringify({
       model,
+      max_output_tokens: OCR_OUTPUT_TOKEN_LIMIT,
+      reasoning: { effort: "minimal" },
       input: [
         {
           role: "developer",
@@ -97,7 +259,7 @@ async function extractProblemTextFromImage(
             {
               type: "input_image",
               image_url: imageDataUrl,
-              detail: "auto",
+              detail: "low",
             },
           ],
         },
@@ -119,7 +281,10 @@ async function extractProblemTextFromImage(
     throw new Error(message);
   }
 
-  return extractOutputText(data) ?? "";
+  return {
+    text: extractOutputText(data) ?? "",
+    usage: extractUsage(data),
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -128,7 +293,7 @@ export async function POST(request: NextRequest) {
   const lang = body.lang === "zh" ? "zh" : "en";
   const imageDataUrl = body.imageDataUrl?.trim();
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL || "gpt-5.5";
+  const model = DEFAULT_OCR_MODEL;
 
   if (!topic && !imageDataUrl) {
     return NextResponse.json(
@@ -155,30 +320,88 @@ export async function POST(request: NextRequest) {
   }
 
   let mergedTopic = topic ?? "";
+  let budgetState = await readOcrBudgetState();
+  let ocrUsage: OcrUsage | undefined;
+  let ocrAttempted = false;
+  let ocrUsed = false;
+  let forcedTextOnly = false;
 
-  if (imageDataUrl && apiKey) {
-    try {
-      const extracted = await extractProblemTextFromImage(apiKey, imageDataUrl, lang, model);
-      if (extracted.trim()) {
-        mergedTopic = mergedTopic ? `${mergedTopic}\n\n${extracted.trim()}` : extracted.trim();
-      }
-    } catch (error) {
-      if (!mergedTopic) {
-        return NextResponse.json(
-          {
-            error:
-              error instanceof Error
-                ? error.message
-                : lang === "zh"
-                  ? "题目图片识别失败，请稍后重试。"
-                  : "Failed to read the problem image. Please try again.",
-          },
-          { status: 502 },
-        );
+  if (shouldRunImageOcr(topic, imageDataUrl, apiKey)) {
+    const remainingBudget = Math.max(0, budgetState.totalBudget - budgetState.totalUsed);
+
+    if (remainingBudget < OCR_REQUEST_TOKEN_RESERVE) {
+      forcedTextOnly = true;
+    } else {
+      ocrAttempted = true;
+
+      try {
+        const extracted = await extractProblemTextFromImage(apiKey as string, imageDataUrl as string, lang, model);
+        ocrUsage = extracted.usage;
+        ocrUsed = extracted.usage.totalTokens > 0 || extracted.text.trim().length > 0;
+
+        if (extracted.text.trim()) {
+          mergedTopic = mergedTopic ? `${mergedTopic}\n\n${extracted.text.trim()}` : extracted.text.trim();
+        }
+
+        if (extracted.usage.totalTokens > 0) {
+          budgetState = {
+            totalBudget: budgetState.totalBudget,
+            totalUsed: Math.min(
+              budgetState.totalBudget,
+              budgetState.totalUsed + extracted.usage.totalTokens,
+            ),
+            updatedAt: new Date().toISOString(),
+          };
+          await writeOcrBudgetState(budgetState);
+        }
+      } catch (error) {
+        if (!mergedTopic) {
+          return NextResponse.json(
+            {
+              error:
+                error instanceof Error
+                  ? error.message
+                  : lang === "zh"
+                    ? "题目图片识别失败，请稍后重试。"
+                    : "Failed to read the problem image. Please try again.",
+            },
+            { status: 502 },
+          );
+        }
       }
     }
   }
 
+  if (!mergedTopic) {
+    return NextResponse.json(
+      {
+        error:
+          forcedTextOnly && lang === "zh"
+            ? "当前 OCR 预算已受限，请补充题目文字后再生成方案。"
+            : forcedTextOnly
+              ? "OCR budget is exhausted for image-only input. Please add problem text and try again."
+              : lang === "zh"
+                ? "未能从图片中提取有效题目文字，请补一段文字说明后重试。"
+                : "No usable problem text could be extracted from the image. Please add a short text description and try again.",
+      },
+      { status: 400 },
+    );
+  }
+
   const plan = recommendPlanFromDistilledData(mergedTopic, lang);
-  return NextResponse.json({ plan });
+  const meta: PlanResponseMeta = {
+    mode: ocrUsed ? "local-kb-plus-ocr" : "local-kb",
+    ocrAttempted,
+    ocrUsed,
+    ocrBudget: {
+      totalBudget: budgetState.totalBudget,
+      totalUsed: budgetState.totalUsed,
+      remaining: Math.max(0, budgetState.totalBudget - budgetState.totalUsed),
+      requestReserve: OCR_REQUEST_TOKEN_RESERVE,
+    },
+    ocrUsage,
+    budgetNotice: buildBudgetNotice(lang, budgetState, ocrUsage, forcedTextOnly),
+  };
+
+  return NextResponse.json({ plan, meta });
 }
