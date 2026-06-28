@@ -290,9 +290,9 @@ const EXAMPLE_TOPICS = {
     "设计一个电感电容测量装置，要求自动切换量程并输出测量结果。",
   ],
   en: [
-    "Design a signal distortion measurement device that reports the fundamental, harmonics, and THD.",
-    "Design a coaxial cable length and terminal-load detector that identifies open, short, and matched cases.",
-    "Design an inductance and capacitance measurement device with automatic range switching.",
+    "设计一个信号失真度测量装置，要求测量基波和谐波并给出 THD。",
+    "设计一个同轴电缆长度与终端负载检测装置，要求识别开路、短路和匹配负载。",
+    "设计一个电感电容测量装置，要求自动切换量程并输出测量结果。",
   ],
 };
 
@@ -308,16 +308,16 @@ async function compressImageFile(file: File) {
         resolve(reader.result);
         return;
       }
-      reject(new Error("Failed to read image."));
+      reject(new Error("读取图片失败。"));
     };
-    reader.onerror = () => reject(new Error("Failed to read image."));
+    reader.onerror = () => reject(new Error("读取图片失败。"));
     reader.readAsDataURL(file);
   });
 
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("Failed to decode image."));
+    img.onerror = () => reject(new Error("图片解码失败。"));
     img.src = dataUrl;
   });
 
@@ -330,7 +330,7 @@ async function compressImageFile(file: File) {
 
   const context = canvas.getContext("2d");
   if (!context) {
-    throw new Error("Canvas is unavailable.");
+    throw new Error("当前环境不支持图片压缩。");
   }
 
   context.drawImage(image, 0, 0, width, height);
@@ -405,6 +405,29 @@ export default function InstrumentationContent() {
             provincialFloor: "省奖保底线",
             stretchSignals: "冲高信号",
             fallbackTriggers: "回退触发条件",
+            buildPack: "搭建包",
+            familyBuildPackTitle: "题族级搭建与标定包",
+            failureAtlas: "故障图谱",
+            familyFailureAtlasTitle: "跨题通用故障与恢复图谱",
+            answerTemplate: "答辩模板",
+            familyAnswerTemplateTitle: "跨题通用答辩话术模板",
+            thirtySecondPitch: "30 秒开场话术",
+            metricLadder: "指标阶梯",
+            familyMetricLadderTitle: "从可提交到省奖再到冲高的信号阶梯",
+            trainingSequence: "训练顺序",
+            familyTrainingSequenceTitle: "题族级训练路线",
+            referenceGraph: "参考图谱",
+            familyReferenceGraphTitle: "历年锚点与迁移图谱",
+            decisionTree: "决策树",
+            familyDecisionTreeTitle: "路线选择与回退逻辑",
+            triggerPack: "触发包",
+            familyTriggerPackTitle: "基于线索的题族触发规则",
+            correctionPack: "纠偏包",
+            familyCorrectionPackTitle: "题族级防混淆纠偏包",
+            handoffMatrix: "切换矩阵",
+            familyHandoffPackTitle: "跨题族切换指引",
+            statementPatterns: "表述模板",
+            familyStatementPatternPackTitle: "蒸馏后的题面表述模板",
             coreBom: "核心器件清单",
             optionalUpgrades: "可选升级项",
             benchSetup: "台架配置",
@@ -1407,10 +1430,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-200/80">
-                        {lang === "zh" ? "搭建包" : "Build Pack"}
+                        {uiText.buildPack}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        {lang === "zh" ? "题族级搭建与标定包" : "Family-level build and calibration pack"}
+                        {uiText.familyBuildPackTitle}
                       </h4>
                     </div>
 
@@ -1467,10 +1490,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-                        {lang === "zh" ? "故障图谱" : "Failure Atlas"}
+                        {uiText.failureAtlas}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        {lang === "zh" ? "跨题通用故障与恢复图谱" : "Cross-problem failure and recovery map"}
+                        {uiText.familyFailureAtlasTitle}
                       </h4>
                     </div>
 
@@ -1518,16 +1541,16 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-200/80">
-                        Answer Template
+                        {uiText.answerTemplate}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        Cross-problem defense speaking templates
+                        {uiText.familyAnswerTemplateTitle}
                       </h4>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="rounded-[26px] bg-white/6 p-5">
-                        <p className="text-sm font-semibold text-amber-200">30-Second Pitch</p>
+                        <p className="text-sm font-semibold text-amber-200">{uiText.thirtySecondPitch}</p>
                         <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                           {plan.familyAnswerTemplate.thirtySecondPitch.map((item) => (
                             <li key={item}>- {item}</li>
@@ -1569,10 +1592,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-                        Metric Ladder
+                        {uiText.metricLadder}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        Submission to provincial to stretch signals
+                        {uiText.familyMetricLadderTitle}
                       </h4>
                     </div>
 
@@ -1611,10 +1634,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-200/80">
-                        Training Sequence
+                        {uiText.trainingSequence}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        Family-level training route
+                        {uiText.familyTrainingSequenceTitle}
                       </h4>
                     </div>
 
@@ -1662,10 +1685,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-                        {lang === "zh" ? "参考图谱" : "Reference Graph"}
+                        {uiText.referenceGraph}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        {lang === "zh" ? "历年锚点与迁移图谱" : "Historical anchor and transfer graph"}
+                        {uiText.familyReferenceGraphTitle}
                       </h4>
                     </div>
 
@@ -1713,10 +1736,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-200/80">
-                        {lang === "zh" ? "决策树" : "Decision Tree"}
+                        {uiText.decisionTree}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        {lang === "zh" ? "路线选择与回退逻辑" : "Route selection and fallback logic"}
+                        {uiText.familyDecisionTreeTitle}
                       </h4>
                     </div>
 
@@ -1764,10 +1787,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-                        {lang === "zh" ? "触发包" : "Trigger Pack"}
+                        {uiText.triggerPack}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        {lang === "zh" ? "基于线索的题族触发规则" : "Cue-based family trigger rules"}
+                        {uiText.familyTriggerPackTitle}
                       </h4>
                     </div>
 
@@ -1815,10 +1838,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-                        {lang === "zh" ? "纠偏包" : "Correction Pack"}
+                        {uiText.correctionPack}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        {lang === "zh" ? "题族级防混淆纠偏包" : "Family-level anti-confusion recovery pack"}
+                        {uiText.familyCorrectionPackTitle}
                       </h4>
                     </div>
 
@@ -1866,10 +1889,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-                        {lang === "zh" ? "切换矩阵" : "Handoff Matrix"}
+                        {uiText.handoffMatrix}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        {lang === "zh" ? "跨题族切换指引" : "Cross-family pivot guidance"}
+                        {uiText.familyHandoffPackTitle}
                       </h4>
                     </div>
 
@@ -1927,16 +1950,16 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-                        Statement Patterns
+                        {uiText.statementPatterns}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        Distilled problem-statement templates
+                        {uiText.familyStatementPatternPackTitle}
                       </h4>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="rounded-[26px] bg-white/6 p-5">
-                        <p className="text-sm font-semibold text-amber-200">Goal Phrases</p>
+                        <p className="text-sm font-semibold text-amber-200">{uiText.goalPhrases}</p>
                         <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                           {plan.familyStatementPatternPack.goalPhrases.map((item) => (
                             <li key={item}>- {item}</li>
@@ -1945,7 +1968,7 @@ export default function InstrumentationContent() {
                       </div>
 
                       <div className="rounded-[26px] bg-white/6 p-5">
-                        <p className="text-sm font-semibold text-amber-200">Metric Phrases</p>
+                        <p className="text-sm font-semibold text-amber-200">{uiText.metricPhrases}</p>
                         <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                           {plan.familyStatementPatternPack.metricPhrases.map((item) => (
                             <li key={item}>- {item}</li>
@@ -1954,7 +1977,7 @@ export default function InstrumentationContent() {
                       </div>
 
                       <div className="rounded-[26px] bg-white/6 p-5">
-                        <p className="text-sm font-semibold text-amber-200">Constraint Phrases</p>
+                        <p className="text-sm font-semibold text-amber-200">{uiText.constraintPhrases}</p>
                         <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                           {plan.familyStatementPatternPack.constraintPhrases.map((item) => (
                             <li key={item}>- {item}</li>
@@ -1963,7 +1986,7 @@ export default function InstrumentationContent() {
                       </div>
 
                       <div className="rounded-[26px] bg-white/6 p-5">
-                        <p className="text-sm font-semibold text-amber-200">Deliverable Phrases</p>
+                        <p className="text-sm font-semibold text-amber-200">{uiText.deliverablePhrases}</p>
                         <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                           {plan.familyStatementPatternPack.deliverablePhrases.map((item) => (
                             <li key={item}>- {item}</li>
@@ -2605,12 +2628,12 @@ export default function InstrumentationContent() {
                           problem.preferredStoryline?.length ||
                           problem.overclaimBoundaries?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Disambiguation Map</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.disambiguationMap}</p>
                               <div className="mt-4 grid gap-4 md:grid-cols-2">
                                 {problem.easyToConfuseWith?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Easy To Confuse With
+                                      {uiText.easyToConfuseWith}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.easyToConfuseWith.map((item) => (
@@ -2623,7 +2646,7 @@ export default function InstrumentationContent() {
                                 {problem.separatingSignals?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Separating Signals
+                                      {uiText.separatingSignals}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.separatingSignals.map((item) => (
@@ -2636,7 +2659,7 @@ export default function InstrumentationContent() {
                                 {problem.preferredStoryline?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Preferred Storyline
+                                      {uiText.preferredStoryline}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.preferredStoryline.map((item) => (
@@ -2649,7 +2672,7 @@ export default function InstrumentationContent() {
                                 {problem.overclaimBoundaries?.length ? (
                                   <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/80">
-                                      Overclaim Boundaries
+                                      {uiText.overclaimBoundaries}
                                     </p>
                                     <ul className="mt-2 space-y-2 text-sm leading-7 text-slate-200">
                                       {problem.overclaimBoundaries.map((item) => (
