@@ -33,6 +33,7 @@ import {
   historicalValidationPacks,
   historicalWinningPatterns,
   instrumentationFamilyPlaybooks,
+  localizeRichZh,
 } from "@/lib/instrumentation-kb-rich";
 
 export interface LocalizedText {
@@ -4243,6 +4244,49 @@ function getRichLocalizedText(
   return text.zh || text.en;
 }
 
+const DISPLAY_ONLY_BYPASS_KEYS = new Set([
+  "id",
+  "code",
+  "references",
+  "typicalReferences",
+  "redirectProfileId",
+  "competingProfileId",
+]);
+
+function forceZhDisplayText(text: string) {
+  return localizeRichZh(text)
+    .replace(/^次级题型补充：\?+/g, "次级题型补充：")
+    .replace(/\?{3,}/g, "")
+    .trim();
+}
+
+function forceZhDisplayValue<T>(value: T, key?: string): T {
+  if (DISPLAY_ONLY_BYPASS_KEYS.has(key ?? "")) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    return forceZhDisplayText(value) as T;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => forceZhDisplayValue(item, key)) as T;
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([entryKey, entryValue]) => [
+        entryKey,
+        DISPLAY_ONLY_BYPASS_KEYS.has(entryKey)
+          ? entryValue
+          : forceZhDisplayValue(entryValue, entryKey),
+      ]),
+    ) as T;
+  }
+
+  return value;
+}
+
 function getFamilyPlaybook(profileId: string, lang: "en" | "zh") {
   const playbook = instrumentationFamilyPlaybooks.find((item) => item.profileId === profileId);
   if (!playbook) {
@@ -6316,7 +6360,7 @@ export function recommendPlanFromDistilledDataRich(
     modules.push({
       title:
         lang === "zh"
-          ? `???????${getText(supportProfile.profile.family, lang)}`
+          ? `次级题型补充：${getText(supportProfile.profile.family, lang)}`
           : `Secondary family add-on: ${getText(supportProfile.profile.family, lang)}`,
       items: supportProfile.profile.modules[0]
         ? supportProfile.profile.modules[0].items.map((item) => getText(item, lang))
@@ -6362,7 +6406,7 @@ export function recommendPlanFromDistilledDataRich(
           familyPlaybook?.headline ? `Distilled backbone: ${familyPlaybook.headline}` : "",
         ];
 
-  return {
+  const plan: RecommendedPlan = {
     title: getText(selected.title, lang),
     summary: summaryParts.filter(Boolean).join(" "),
     approach,
@@ -6424,6 +6468,8 @@ export function recommendPlanFromDistilledDataRich(
     }),
     routeVariants,
   };
+
+  return lang === "zh" ? forceZhDisplayValue(plan) : plan;
 }
 
 export function recommendPlanFromDistilledData(

@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { localizeRichZh } from "@/lib/instrumentation-kb-rich";
 
 gsap.registerPlugin(useGSAP);
 
@@ -281,6 +282,42 @@ interface PlanMeta {
     totalTokens: number;
   };
   budgetNotice?: string;
+}
+
+const DISPLAY_LOCALIZE_BYPASS_KEYS = new Set(["id", "code", "references", "typicalReferences"]);
+
+function localizeDisplayText(text: string) {
+  return localizeRichZh(text)
+    .replace(/^次级题型补充：\?+/g, "次级题型补充：")
+    .replace(/\?{3,}/g, "")
+    .trim();
+}
+
+function localizeDisplayValue<T>(value: T, key?: string): T {
+  if (DISPLAY_LOCALIZE_BYPASS_KEYS.has(key ?? "")) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    return localizeDisplayText(value) as T;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => localizeDisplayValue(item, key)) as T;
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([entryKey, entryValue]) => [
+        entryKey,
+        DISPLAY_LOCALIZE_BYPASS_KEYS.has(entryKey)
+          ? entryValue
+          : localizeDisplayValue(entryValue, entryKey),
+      ]),
+    ) as T;
+  }
+
+  return value;
 }
 
 const EXAMPLE_TOPICS = {
@@ -798,7 +835,7 @@ export default function InstrumentationContent() {
         throw new Error(data?.error || t.instrumentation.requestFailed);
       }
 
-      setPlan(data.plan);
+      setPlan(localizeDisplayValue(data.plan));
       setPlanMeta(data.meta ?? null);
     } catch (submissionError) {
       setError(
@@ -2001,16 +2038,16 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-                        Family Lexicon
+                        {uiText.statementPatterns}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        High-signal family vocabulary
+                        {uiText.familyStatementPatternPackTitle}
                       </h4>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="rounded-[26px] bg-white/6 p-5">
-                        <p className="text-sm font-semibold text-amber-200">Goal Terms</p>
+                        <p className="text-sm font-semibold text-amber-200">{uiText.goalTerms}</p>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {plan.familyLexiconPack.goalTerms.map((item) => (
                             <span key={item} className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-slate-200">
@@ -2021,7 +2058,7 @@ export default function InstrumentationContent() {
                       </div>
 
                       <div className="rounded-[26px] bg-white/6 p-5">
-                        <p className="text-sm font-semibold text-amber-200">Metric Terms</p>
+                        <p className="text-sm font-semibold text-amber-200">{uiText.metricTerms}</p>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {plan.familyLexiconPack.metricTerms.map((item) => (
                             <span key={item} className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-slate-200">
@@ -2032,7 +2069,7 @@ export default function InstrumentationContent() {
                       </div>
 
                       <div className="rounded-[26px] bg-white/6 p-5">
-                        <p className="text-sm font-semibold text-amber-200">Constraint Terms</p>
+                        <p className="text-sm font-semibold text-amber-200">{uiText.constraintTerms}</p>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {plan.familyLexiconPack.constraintTerms.map((item) => (
                             <span key={item} className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-slate-200">
@@ -2043,7 +2080,7 @@ export default function InstrumentationContent() {
                       </div>
 
                       <div className="rounded-[26px] bg-white/6 p-5">
-                        <p className="text-sm font-semibold text-amber-200">Deliverable Terms</p>
+                        <p className="text-sm font-semibold text-amber-200">{uiText.deliverableTerms}</p>
                         <div className="mt-3 flex flex-wrap gap-2">
                           {plan.familyLexiconPack.deliverableTerms.map((item) => (
                             <span key={item} className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-slate-200">
@@ -2060,10 +2097,10 @@ export default function InstrumentationContent() {
                   <section className="space-y-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/80">
-                        Near-Miss Library
+                        {uiText.correctionPack}
                       </p>
                       <h4 className="mt-2 text-xl font-semibold text-white">
-                        Distilled anti-misclassification cases
+                        {uiText.familyCorrectionPackTitle}
                       </h4>
                     </div>
 
@@ -2193,7 +2230,7 @@ export default function InstrumentationContent() {
 
                           <div className="mt-4 grid gap-4 md:grid-cols-2">
                             <div className="rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Primary Wins When</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.primaryWinsWhen}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {item.primaryWinsWhen.map((entry) => (
                                   <li key={entry}>- {entry}</li>
@@ -2202,7 +2239,7 @@ export default function InstrumentationContent() {
                             </div>
 
                             <div className="rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Competing Wins When</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.competingWinsWhen}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {item.competingWinsWhen.map((entry) => (
                                   <li key={entry}>- {entry}</li>
@@ -2211,7 +2248,7 @@ export default function InstrumentationContent() {
                             </div>
 
                             <div className="rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Reusable Assets</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.reusableAssets}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {item.reusableAssets.map((entry) => (
                                   <li key={entry}>- {entry}</li>
@@ -2220,7 +2257,7 @@ export default function InstrumentationContent() {
                             </div>
 
                             <div className="rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Wrong-Turn Cost</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.wrongTurnCost}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {item.wrongTurnCost.map((entry) => (
                                   <li key={entry}>- {entry}</li>
@@ -2503,7 +2540,7 @@ export default function InstrumentationContent() {
 
                           {problem.coreChain?.length ? (
                             <div className="mt-4 rounded-2xl bg-slate-950/28 p-4">
-                              <p className="text-sm font-semibold text-amber-200">Core Chain</p>
+                              <p className="text-sm font-semibold text-amber-200">{uiText.coreChain}</p>
                               <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
                                 {problem.coreChain.map((item) => (
                                   <li key={item}>- {item}</li>

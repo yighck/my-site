@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { recommendPlanFromDistilledData, type RecommendedPlan } from "@/lib/instrumentation-kb";
+import { localizeRichZh } from "@/lib/instrumentation-kb-rich";
 
 function normalizeOpenAiBaseUrl(baseUrl: string | undefined) {
   const fallback = "https://api.openai.com/v1";
@@ -321,38 +322,10 @@ function localizePlanStringForZh(text: string): string {
     .replace(/^Re-confirm a single known passive on the new hardware\.$/g, "先在新硬件上重新确认一个已知无源器件。")
     .replace(/^Prove one event on both ends first\.$/g, "先证明同一个事件在两端都能一致出现。");
 
-  if (/^[A-Za-z0-9][A-Za-z0-9\s\-_/,:;.()]+$/.test(result) && /[A-Za-z]/.test(result)) {
-    result = result
-      .replace(/\bbenchmark\b/gi, "基准样例")
-      .replace(/\breference\b/gi, "参考")
-      .replace(/\bremote\b/gi, "远端")
-      .replace(/\blocal\b/gi, "本地")
-      .replace(/\bsignal\b/gi, "信号")
-      .replace(/\bmeasurement\b/gi, "测量")
-      .replace(/\bmodule\b/gi, "模块")
-      .replace(/\bcapture\b/gi, "采集")
-      .replace(/\bsolver\b/gi, "求解")
-      .replace(/\bfilter\b/gi, "滤波")
-      .replace(/\bgeometry\b/gi, "几何")
-      .replace(/\broute\b/gi, "路线")
-      .replace(/\bstate\b/gi, "状态")
-      .replace(/\btruth\b/gi, "真值")
-      .replace(/\bconsistency\b/gi, "一致性")
-      .replace(/\bphase\b/gi, "相位")
-      .replace(/\bamplitude\b/gi, "幅值")
-      .replace(/\bfrequency\b/gi, "频率")
-      .replace(/\btiming\b/gi, "时序")
-      .replace(/\bcalibration\b/gi, "标定")
-      .replace(/\bvalidation\b/gi, "验证")
-      .replace(/\bclassification\b/gi, "分类")
-      .replace(/\bparameter\b/gi, "参数")
-      .replace(/\bdistortion\b/gi, "失真")
-      .replace(/\bmodel\b/gi, "模型")
-      .replace(/\breplay\b/gi, "回放")
-      .replace(/\banchor\b/gi, "锚点");
-  }
-
-  return result;
+  return localizeRichZh(result)
+    .replace(/^次级题型补充：\?+/g, "次级题型补充：")
+    .replace(/\?{3,}/g, "")
+    .trim();
 }
 
 function deepLocalizePlanForZh<T>(value: T): T {
