@@ -77,7 +77,13 @@ export interface TierOption {
 export interface RecommendedPlan {
   title: string;
   summary: string;
-  approach: string;
+  approach:
+    | string
+    | {
+        hardware: string[];
+        software: string[];
+        integration: string[];
+      };
   modules: Array<{
     title: string;
     items: string[];
@@ -5724,28 +5730,71 @@ function buildDirectChineseReasoning(
   ]).slice(0, 3);
 }
 
-function buildDirectChineseApproach(
+function inferDirectChineseHardwareOverview(
   selected: InstrumentationProfile,
   modules: Array<{ title: string; items: string[] }>,
   supportProfiles: Array<{ profile: InstrumentationProfile }>,
 ) {
-  const moduleFlow = modules.slice(0, 3).map((module) => module.title);
+  const moduleItems = modules.flatMap((module) => module.items);
+  const supportModuleItems = supportProfiles.flatMap((profile) =>
+    (profile.profile.modules[0]?.items ?? []).map((item) => getText(item, "zh")),
+  );
+  const hardwareSignals = dedupeStrings([...moduleItems, ...supportModuleItems]);
+
+  return dedupeStrings([
+    hardwareSignals.length
+      ? `硬件主链建议围绕这些模块搭建：${hardwareSignals.slice(0, 6).join("、")}。`
+      : undefined,
+    "主控部分优先预留采样、量程切换、结果显示和参数标定的控制接口，避免后期联调时反复改线。",
+    "模拟前端尽量拆成激励/参考、信号调理、采样输入三段，便于分别排查幅值、相位和噪声问题。",
+  ]).slice(0, 3);
+}
+
+function inferDirectChineseSoftwareOverview(
+  selected: InstrumentationProfile,
+  supportProfiles: Array<{ profile: InstrumentationProfile }>,
+) {
   const supportFamilies = dedupeStrings(
     supportProfiles.map((profile) => getText(profile.profile.family, "zh")),
   );
 
   return dedupeStrings([
     getText(selected.approach, "zh"),
-    moduleFlow.length
-      ? `推进顺序建议按“${moduleFlow.join(" -> ")}”展开，先把主闭环跑通，再逐步补齐扩展功能和展示链路。`
-      : undefined,
+    "软件主线按“采样取数 -> 特征提取 -> 参数计算或判决 -> 标定补偿 -> 结果输出”展开，先保证核心测量链路稳定，再补充扩展展示。",
     supportFamilies.length
-      ? `如果题面同时带有${supportFamilies.join("、")}的辅线要求，建议在主方案稳定后再吸收对应模块，不要一开始并行铺开。`
+      ? `如果题面还带有${supportFamilies.join("、")}的辅线要求，相关算法建议等主链稳定后再接入，不要一开始并行堆功能。`
       : undefined,
-    selected.references.length
-      ? `实现节奏可以参考 ${selected.references.slice(0, 2).join("、")} 的搭建和联调顺序。`
+  ]).slice(0, 3);
+}
+
+function inferDirectChineseIntegrationOverview(
+  modules: Array<{ title: string; items: string[] }>,
+) {
+  const moduleFlow = modules.slice(0, 3).map((module) => module.title);
+
+  return dedupeStrings([
+    modules[0]
+      ? `先单独打通“${modules[0].title}”，确认输入、处理和输出可以稳定复现，再进入整机联调。`
       : undefined,
-  ]).join(" ");
+    modules[1]
+      ? `第二步联调“${modules[1].title}”，重点观察主指标是否连续稳定，并同步记录标定参数。`
+      : undefined,
+    moduleFlow.length > 2
+      ? `最后按“${moduleFlow.join(" -> ")}”的顺序补齐扩展模块和展示链路，避免主方案未稳就同时铺开所有功能。`
+      : "最后再补充显示、交互和演示链路，确保现场验收时能稳定复现核心结果。",
+  ]).slice(0, 3);
+}
+
+function buildDirectChineseApproach(
+  selected: InstrumentationProfile,
+  modules: Array<{ title: string; items: string[] }>,
+  supportProfiles: Array<{ profile: InstrumentationProfile }>,
+) {
+  return {
+    hardware: inferDirectChineseHardwareOverview(selected, modules, supportProfiles),
+    software: inferDirectChineseSoftwareOverview(selected, supportProfiles),
+    integration: inferDirectChineseIntegrationOverview(modules),
+  };
 }
 
 function buildDirectChineseTuningSteps(

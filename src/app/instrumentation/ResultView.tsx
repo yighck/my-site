@@ -26,6 +26,23 @@ function SectionList({ title, items }: { title: string; items: string[] }) {
   );
 }
 
+function OverviewBlock({ title, items }: { title: string; items: string[] }) {
+  if (!items.length) {
+    return null;
+  }
+
+  return (
+    <div className="rounded-[20px] bg-white/5 p-4">
+      <h5 className="text-sm font-semibold text-amber-200">{title}</h5>
+      <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-200">
+        {items.map((item) => (
+          <li key={item}>- {item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function ResultView({ plan, planMeta, loading }: Props) {
   if (!plan && !loading) {
     return (
@@ -83,7 +100,11 @@ export default function ResultView({ plan, planMeta, loading }: Props) {
         <h4 className="text-sm font-semibold text-amber-200">
           {INSTRUMENTATION_COPY.overviewLabel}
         </h4>
-        <p className="mt-3 text-sm leading-7 text-slate-200">{plan.overview}</p>
+        <div className="mt-3 grid gap-4 md:grid-cols-3">
+          <OverviewBlock title="硬件模块" items={plan.overview.hardware} />
+          <OverviewBlock title="软件思路" items={plan.overview.software} />
+          <OverviewBlock title="联调顺序" items={plan.overview.integration} />
+        </div>
       </section>
 
       {plan.modules.length ? (

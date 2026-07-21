@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { recommendPlanFromDistilledData, type RecommendedPlan } from "@/lib/instrumentation-kb";
 import { INSTRUMENTATION_VERSION } from "@/app/instrumentation/version";
@@ -20,7 +21,7 @@ const DEFAULT_OCR_MODEL = process.env.OPENAI_OCR_MODEL || process.env.OPENAI_MOD
 const OCR_OUTPUT_TOKEN_LIMIT = 480;
 const OCR_TEXT_PRIORITY_THRESHOLD = 96;
 const HARD_OCR_TOTAL_TOKEN_BUDGET_CAP = 1_000_000;
-const OCR_BUDGET_FILE = path.join(process.cwd(), "data", "instrumentation-ocr-budget.json");
+const OCR_BUDGET_FILE = path.join(os.tmpdir(), "instrumentation-ocr-budget.json");
 
 function parsePositiveIntegerEnv(value: string | undefined, fallback: number, cap?: number) {
   const parsed = Number(value);
@@ -72,10 +73,16 @@ interface SimplePlanSection {
   items: string[];
 }
 
+interface SimplePlanOverview {
+  hardware: string[];
+  software: string[];
+  integration: string[];
+}
+
 interface SimplePlan {
   title: string;
   judgement: string;
-  overview: string;
+  overview: SimplePlanOverview;
   modules: SimplePlanSection[];
   tuningSteps: string[];
 }
@@ -294,25 +301,37 @@ function ensureList(items: string[] | undefined, fallback: string[]) {
   return items && items.length ? items : fallback;
 }
 
-function formatDetailBlock(prefix: string, items: string[] | undefined) {
-  if (!items?.length) {
-    return "";
-  }
-
-  return `${prefix}${items.join("；")}。`;
-}
-
 function simplifyPlan(plan: RecommendedPlan): SimplePlan {
   const referencesText = plan.references?.length ? `参考题源：${plan.references.join("、")}。` : "";
   const matchedText = plan.matchedTerms?.length ? `识别关键词：${plan.matchedTerms.join("、")}。` : "";
   const reasoningText = plan.reasoning?.length ? `判断依据：${plan.reasoning.join("；")}。` : "";
-  const moduleSummaryText = plan.modules?.length
-    ? `建议优先按以下模块搭建：${plan.modules
-        .map((module) => `${module.title}${module.items.length ? `（${module.items.join("、")}）` : ""}`)
-        .join("；")}。`
-    : "";
-  const riskSummaryText = formatDetailBlock("实现时重点注意：", plan.risks);
-  const verificationSummaryText = formatDetailBlock("完成后优先验证：", plan.verification);
+  const overview =
+    typeof plan.approach === "string"
+      ? {
+          hardware: plan.modules?.length
+            ? [
+                `建议优先按以下模块搭建：${plan.modules
+                  .map((module) =>
+                    `${module.title}${module.items.length ? `（${module.items.join("、")}）` : ""}`,
+                  )
+                  .join("；")}。`,
+              ]
+            : [],
+          software: plan.approach ? [plan.approach] : [],
+          integration: [
+            ...((plan.risks ?? []).length
+              ? [`实现时重点注意：${(plan.risks ?? []).join("；")}。`]
+              : []),
+            ...((plan.verification ?? []).length
+              ? [`完成后优先验证：${(plan.verification ?? []).join("；")}。`]
+              : []),
+          ],
+        }
+      : {
+          hardware: plan.approach.hardware ?? [],
+          software: plan.approach.software ?? [],
+          integration: plan.approach.integration ?? [],
+        };
 
   return {
     title: plan.title || "电赛题目方案建议",
@@ -323,12 +342,7 @@ function simplifyPlan(plan: RecommendedPlan): SimplePlan {
       reasoningText,
       referencesText,
     ]),
-    overview: joinCleanLines([
-      plan.approach,
-      moduleSummaryText,
-      riskSummaryText,
-      verificationSummaryText,
-    ]),
+    overview,
     modules: plan.modules?.filter((module) => module.items?.length) ?? [],
     tuningSteps: ensureList(plan.tuningSteps, ["先保证主链路可运行，再逐项校准关键指标。"]),
   };
@@ -392,7 +406,9 @@ export async function POST(request: NextRequest) {
               ),
               updatedAt: new Date().toISOString(),
             };
-            await writeOcrBudgetState(budgetState);
+            await writeOcrBudgetState(budgetState).catch((error) => {
+              console.warn("failed to persist OCR budget state", error);
+            });
           }
         } catch (error) {
           if (!mergedTopic) {

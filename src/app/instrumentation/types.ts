@@ -3,10 +3,16 @@ export interface PlanSection {
   items: string[];
 }
 
+export interface PlanOverview {
+  hardware: string[];
+  software: string[];
+  integration: string[];
+}
+
 export interface InstrumentationPlan {
   title: string;
   judgement: string;
-  overview: string;
+  overview: PlanOverview;
   modules: PlanSection[];
   tuningSteps: string[];
 }
