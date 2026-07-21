@@ -6,10 +6,13 @@ import { useGSAP } from "@gsap/react";
 import { EXAMPLE_TOPICS, INSTRUMENTATION_COPY } from "./content";
 import { compressInstrumentationImage, validateInstrumentationImage } from "./image";
 import ResultView from "./ResultView";
+import { buildStaticInstrumentationPlan } from "./staticPlan";
 import type { InstrumentationResponse, InstrumentationPlan, PlanMeta } from "./types";
 import { INSTRUMENTATION_VERSION } from "./version";
 
 gsap.registerPlugin(useGSAP);
+
+const IS_STATIC_EXPORT = process.env.NEXT_PUBLIC_STATIC_EXPORT === "1";
 
 export default function InstrumentationContent() {
   const scope = useRef<HTMLElement>(null);
@@ -103,6 +106,17 @@ export default function InstrumentationContent() {
     setPlanMeta(null);
 
     try {
+      if (IS_STATIC_EXPORT) {
+        const data = buildStaticInstrumentationPlan(trimmed, imageDataUrl);
+        if (!data.plan) {
+          throw new Error(data.error || INSTRUMENTATION_COPY.requestFailed);
+        }
+
+        setPlan(data.plan);
+        setPlanMeta(data.meta ?? null);
+        return;
+      }
+
       const response = await fetch("/api/instrumentation-plan", {
         method: "POST",
         headers: {
